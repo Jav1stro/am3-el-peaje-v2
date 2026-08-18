@@ -36,6 +36,13 @@ descarta. `app/dist/` es el resultado del build (descartable, se regenera con
   las secciones dicen QUÉ niveles hay; los tipos de nivel dicen CÓMO se juega
   cada mecánica (y se comparten entre secciones — no meterlos en carpetas de
   sección).
+- **Cadenas y expediente** (ver CONTEXT.md y ADR 0004). Una entrada del pool
+  puede ser un array: es una **cadena**, se sortea entera y en orden. Un nivel
+  con `needs: '<id>'` arrastra a la entrada que contiene ese id y el sorteo los
+  separa todo lo posible. Un nivel con `record: 'clave'` guarda su respuesta en
+  el **expediente** (en memoria, muere con la visita) y otro nivel la cita con
+  `{{clave}}` en su texto. En `options`, una opción puede ser
+  `{ label, cita }` — la cita es cómo se lee esa respuesta al ser retomada.
 - `src/secciones/` — pool de niveles, **un archivo por sección**
   (`seccion-1-mecanica.js`, `seccion-2-intima.js`, `seccion-3-cuerpo.js`).
   Cada archivo exporta su pool; `index.js` ensambla `LEVELS` asignando el
@@ -45,8 +52,16 @@ descarta. `app/dist/` es el resultado del build (descartable, se regenera con
   borde de su sección, fuera del sorteo. `'first'` lo ancla al inicio, `'last'`
   al cierre. Hoy: `checkbox` abre la S1, `tos` la cierra, y `dibujo` cierra la S3.
 - `src/tipos-de-nivel/` — un componente React por mecánica (checkbox, imagen,
-  opciones, puzzle, tos, prioridades, cámara, sketch, dibujo). `OptionsLevel`
-  lo usan S1 y S2. El `TosLevel` (términos y condiciones) toma sus textos de
+  opciones, texto, declarativo, puzzle, tos, prioridades, cámara, sketch,
+  dibujo). `StatementLevel` (declarativo) es el único donde la máquina habla
+  sin pedir nada: sólo se puede continuar.
+  `OptionsLevel` lo usan S1 y S2. `DistortedLevel` acepta dos vías: `img` (una
+  imagen hecha a mano) o `word` (la palabra como dato — la dibuja el componente
+  con letras torcidas, ondas y moteado). Con `word`, los **dígitos** salen en el
+  violeta de la máquina y las letras en la paleta institucional: por eso
+  `sequ1a` se lee como intervenida. `TextLevel` (pregunta abierta con input) no
+  trae textos propios: el nivel le pasa `logo`, `question`, `subtitle`,
+  `placeholder` y `emptyHint`, para que la mecánica sirva a cualquier sección. El `TosLevel` (términos y condiciones) toma sus textos de
   `src/data/tosText.js` (editables sin tocar el componente). `PrioridadesLevel`
   (depositar derechos en casillas de prescindibilidad) es un nivel nativo —
   antes era un sketch en iframe; se pasó a nativo para que herede la

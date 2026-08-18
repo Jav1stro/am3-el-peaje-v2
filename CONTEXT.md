@@ -1,8 +1,9 @@
 # El Peaje v2 — Glosario de dominio
 
 Misma obra que El Peaje (v1), nueva iteración. Comparte el universo conceptual
-(el captcha como metáfora del sometimiento digital) pero reemplaza el loop
-infinito por un **recorrido** lineal por secciones.
+(el captcha como metáfora del sometimiento digital, con **el agua** como lo que
+está en disputa) pero reemplaza el loop infinito por un **recorrido** lineal por
+secciones.
 
 ---
 
@@ -24,8 +25,8 @@ invasión:
 
 1. **Verificación mecánica** — captchas tradicionales: checkbox, imágenes,
    texto distorsionado, puzzle. El sistema verifica gestos.
-2. **Extracción de lo íntimo** — el sistema pregunta por emociones, hábitos,
-   conducta; pide renunciar a derechos. Verifica el interior.
+2. **Extracción de lo íntimo** — el sistema pregunta por emociones, recuerdos,
+   hábitos, conducta; pide renunciar a derechos. Verifica el interior.
 3. **El cuerpo en juego** — cámara, micrófono, movimiento y juegos de p5.
    Verifica el cuerpo. Cierra con el **nivel de dibujo**.
 
@@ -71,13 +72,40 @@ _Evitar_: estética (v1: sistema de temas seleccionables), tema, skin
 
 ---
 
+## El agua
+
+Lo que está en disputa, y lo que las dos partes necesitan. La fachada la
+presenta como la recompensa del trámite: un vaso dentro de una caja de cristal,
+a la vista, cuyo acceso el sistema promete administrar a cambio de que el
+visitante demuestre ser humano.
+
+Lo que la fachada no dice es por qué el sistema es **receloso** con ella: la
+**máquina** también la necesita. El agua es lo que enfría sus servidores y lo
+que sostiene su inteligencia. No la retiene por burocracia ni la sustrae a
+escondidas — la cuida porque le hace falta para seguir funcionando. El
+visitante y la máquina quieren lo mismo por razones distintas: uno para vivir,
+la otra para pensar y no recalentarse. Por eso la caja no se abre nunca:
+abrirla sería ceder.
+
+La escalada va con el **caos**: en las primeras secciones el agua aparece como
+trámite (identificarla, declarar cuándo tomaste), más tarde como carencia. El
+recelo nunca se anuncia; se destapa.
+_Evitar_: robo, la máquina como villana (no esconde ni sustrae: compite por una
+necesidad propia), premio/recompensa (así la nombra la fachada, no la obra),
+sed como tema abstracto (el agua de esta obra es concreta: hay un vaso, hay una
+caja)
+
+---
+
 ## Máquina
 
 Lo que hay detrás de la fachada institucional: la verdad del sistema que el
 captcha disimula. Empieza como un arranque de sistema tímido, pasa por una
 terminal descifrando, y termina en corrupción total (datamosh). Se revela
 gradualmente con el **caos** — el teatro de la verificación se cae y aparece
-la máquina extractiva que estuvo ahí todo el tiempo.
+la máquina extractiva que estuvo ahí todo el tiempo. Lo que necesita, en última
+instancia, es **el agua**: la misma que el visitante. No es una villana — es un
+organismo con sed propia, que se enfría con lo que a la otra parte le falta.
 _Evitar_: fondo, textura, imagen decorativa
 
 ---
@@ -91,6 +119,38 @@ secciones (las preguntas de opciones aparecen en la sección 1 y en la 2). Lo
 que define a qué sección va un nivel es su contenido, no su mecánica.
 _Evitar_: componente, mecánica suelta, "el captcha de opciones" (ambiguo:
 nombra al tipo, no al nivel)
+
+---
+
+## Cadena
+
+Dos o más niveles que entran al recorrido juntos y en orden, porque el segundo
+vuelve sobre el primero: el visitante contesta algo y la máquina lo retoma.
+Se sortean como una sola pieza — nunca aparece la respuesta sin su pregunta.
+Entre eslabón y eslabón corre el **teatro de verificación**: la máquina finge
+procesar lo que le dijiste antes de usarlo en tu contra.
+
+Un eslabón puede además caer lejos de su origen y arrastrarlo: si el recorrido
+elige el recordatorio, la pregunta que lo alimenta entra antes que él, con
+otros niveles en el medio. El olvido del visitante es parte del efecto.
+_Evitar_: secuencia (el recorrido entero también lo es), bloque, pareja (una
+cadena puede tener más de dos eslabones)
+
+---
+
+## Expediente
+
+Lo que la máquina dice tener sobre el visitante. A medida que el recorrido
+avanza, el sistema le devuelve sus propias respuestas —*"hace más de tres horas
+que no tomás agua"*— y declara que lo que contestó ya es material de
+entrenamiento.
+
+El expediente existe sólo mientras dura la visita y muere con ella: no se
+guarda, no se persiste, no sale del teléfono. La vigilancia es una actuación,
+igual que el **teatro de verificación**. Lo que sí es real es la sensación de
+ser citado: la máquina no necesita guardar nada para que duela que se acuerde.
+_Evitar_: base de datos, perfil, sesión (ver **Empezar de cero**: no persiste
+nada), memoria (la máquina no recuerda entre visitas)
 
 ---
 

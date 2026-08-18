@@ -47,7 +47,8 @@ am3-el-peaje-v2/
 ├── docs/adr/               # Decisiones de arquitectura
 │   ├── 0001-recorrido-lineal-con-final.md
 │   ├── 0002-impresion-por-relay.md
-│   └── 0003-maquina-detras-de-la-fachada.md
+│   ├── 0003-maquina-detras-de-la-fachada.md
+│   └── 0004-el-expediente.md
 ├── app/                    # La aplicación (React + Vite)
 │   ├── public/
 │   │   ├── imagenes/       # Assets de los captchas (semáforos, agua, puzzle…)
@@ -91,8 +92,8 @@ mecánicas se comparten entre secciones, por eso viven aparte.
 
 | Sección | Nombre | Niveles a mostrar | Rampa de caos |
 |---|---|---|---|
-| 1 | Verificación mecánica | 5 | 0 → 3 |
-| 2 | Extracción de lo íntimo | 4 (hoy se recorta a 3) | 5 → 7 |
+| 1 | Verificación mecánica | 7 | 0 → 3 |
+| 2 | Extracción de lo íntimo | 6 | 5 → 7 |
 | 3 | El cuerpo en juego | 2 | 8 → 9 |
 
 Los saltos de caos grandes ocurren **al cambiar de sección** (se siente, no se
@@ -102,30 +103,69 @@ anuncia).
 
 ## Secciones y niveles
 
-### Sección 1 — Verificación mecánica (pool de 8)
+### Sección 1 — Verificación mecánica (pool de 12, muestra 7)
+
+El agua entra acá como **trámite**, no como disputa: se mezcla con niveles
+neutros que sostienen la fachada. La proporción (3 neutros / 7 de agua entre los
+sorteables) es deliberada — ver CONTEXT.md → El agua.
+
 - `checkbox` — "No soy un robot". **Ancla de apertura** (siempre primero).
-- `semaforos`, `agua` — selección de imágenes.
-- `distorsionado-1`, `distorsionado-2` — transcribir texto distorsionado.
+- `semaforos` — selección de imágenes. Neutro: es la cara del captcha genérico.
+- `puzzle` — ordenar 9 fragmentos. Neutro.
+- `distorsionado-1`, `distorsionado-2` — texto distorsionado por imagen (JPG).
+  Neutros.
+- `agua` — selección de imágenes.
+- `fuente-agua` — selección de imágenes: "una fuente de agua potable".
+  **Usa fotos provisorias** (las de `agua`) hasta que lleguen las definitivas.
+- `sed`, `sequia`, `polidipsia` — texto distorsionado **generado por la app**
+  (`word`, no `img`). Son una escalada —tu sed, la del mundo, el diagnóstico—
+  pero el sorteo no garantiza ni que salgan las tres ni el orden: cada una se
+  lee sola. En `sequ1a` el `1` va en el violeta de la máquina.
 - `pregunta-agua` — opción múltiple (error no verificable).
-- `puzzle` — ordenar 9 fragmentos.
 - `tos` — Términos y Condiciones que crecen con adendas al scrollear. **Ancla de
   cierre** (transición hacia la sección 2). El párrafo final se resalta con un
   adelanto de la estética violeta.
 
-### Sección 2 — Extracción de lo íntimo (pool de 3)
+### Sección 2 — Extracción de lo íntimo (pool de 17, muestra 6)
+
+Sueltos:
 - `emociones` — opción múltiple (error no verificable).
 - `perfil-conductual` — opción múltiple.
+- `miedo-infancia` — pregunta abierta con input: *"Contame a qué le tenías miedo
+  cuando eras chico."* El sistema abandona el usted: la cercanía fingida como
+  método de extracción (error no verificable).
 - `prioridades` — **drag-and-drop nativo**: arrastrás tus derechos a casillas de
   "prescindibilidad"; al enviar, tus renuncias se convierten en términos de
-  extracción de datos. (Antes era un sketch de p5 en iframe; se pasó a nativo
-  para que herede la degradación por caos.)
+  extracción de datos.
+- `descanso-distorsionado` — texto distorsionado sin significado. Es el respiro
+  y a la vez la tesis: un significante sin contenido.
+- `aprendizaje-niveles` — opción múltiple, tono de formulario.
+
+Cadenas (entran juntas y en orden; el error va siempre en el último eslabón):
+- **ternura** → *"¿sabías que para mí la ternura no es más que un significante?"*
+- **secreto** → *"¿te atormenta? el secreto, digo…"*
+- **Núremberg** (consentimiento informado desde 1947) → *"vos lo sabés,"*
+- **"¿y a vos esto te enseña algo?"** → el deseo. Su error es el agradecimiento
+  por aportar a la base de datos de entrenamiento.
+
+Con dependencia:
+- `agua-cuando` — cuándo tomaste agua por última vez; su respuesta va al
+  **expediente**.
+- `agua-recordatorio` — nivel **declarativo** que te cita: *"no tomás agua desde
+  hace más de tres horas"*. Declara `needs: 'agua-cuando'`, así que arrastra a
+  la pregunta y el sorteo las separa lo más posible (hoy, 4 niveles en el medio).
+
+Ancla de cierre:
+- `quien-es-mas-maquina` — la tesis de la obra, fuera del sorteo: *"si los dos
+  necesitamos de agua para existir y sabemos comunicarnos, ¿quién es más máquina
+  y quién más humano?"* Justo antes de que la S3 te pida el cuerpo.
 
 ### Sección 3 — El cuerpo en juego (pool de 2)
 - `camara` — verificación facial fake con métricas biométricas.
 - `dibujo` — el visitante dibuja en su teléfono. **Ancla de cierre**; ese dibujo
   es lo que se imprime en sala.
 
-Recorrido típico: ~10 niveles.
+Recorrido típico: 15 niveles.
 
 ---
 
@@ -174,11 +214,32 @@ Requiere en Supabase un bucket público `dibujos`. La app lee
 **Funciona hoy**
 - Recorrido completo de punta a punta con las tres secciones.
 - Todos los tipos de nivel implementados (checkbox, imágenes, texto distorsionado,
-  opciones, puzzle, TOS, prioridades drag-and-drop, cámara, dibujo).
+  opciones, pregunta abierta, puzzle, TOS, prioridades drag-and-drop, cámara,
+  dibujo).
 - Sistema de caos + máquina + teatro de verificación, coherentes entre sí.
 - `npm run build` compila sin errores.
 
 **Pendiente / a definir**
+- **BORRAR ANTES DE LA SALA: la pantalla de montaje.** `?montaje` abre un panel
+  de desarrollo para elegir, por sección, qué niveles entran y cuáles abren y
+  cierran; la decisión viaja en la URL y el enlace se comparte. Es andamiaje
+  para decidir en grupo, no parte de la obra. Para sacarla: borrar
+  `app/src/montaje/` y las líneas marcadas con `// montaje:` en `src/main.jsx`
+  y `src/store/useRecorridoStore.js`. Un visitante que entra por el QR nunca la
+  ve, pero mientras exista está en el build.
+- **Fotos de `fuente-agua`.** Faltan las 6 definitivas; hoy el nivel usa las de
+  `agua` como provisorias. Van en `public/imagenes/` como `img_fuente_1..6.jpg`
+  y se cambia una línea en `secciones/seccion-1-mecanica.js`.
+- **El recelo de la máquina está enunciado, no construido.** El glosario dice
+  que la máquina necesita el agua para enfriar servidores y sostener su
+  inteligencia. En la obra eso aparece **una sola vez**: la premisa *"si los dos
+  necesitamos de agua para existir"* del nivel `quien-es-mas-maquina`, que
+  cierra la S2. Nada antes la prepara —no hay una sola mención de refrigeración,
+  temperatura o servidores en todo el contenido— así que el visitante llega a
+  esa pregunta habiendo visto quince niveles donde el agua fue siempre *su*
+  carencia. Los tres lugares candidatos para construirla: el teatro de
+  verificación (que las esperas muestren el costo térmico), un nivel de la S2, o
+  una cláusula en los T&C.
 - **Acceso desde el celular con sensores.** La cámara y los sensores exigen HTTPS;
   por IP local (`http://`) el navegador los bloquea. Falta resolver HTTPS (túnel
   o deploy a Vercel) para probar cámara en un teléfono real.

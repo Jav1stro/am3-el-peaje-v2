@@ -1,7 +1,9 @@
 // Configuración del recorrido.
 // Cantidad de niveles a sortear por sección (se recorta al tamaño del pool
 // si el pool todavía es más chico).
-export const SECTION_LEVEL_COUNTS = [5, 4, 2];
+// La S2 tiene un pool grande (17 niveles): acá se decide cuántos ve cada
+// visitante. Ojo que una cadena consume tantos lugares como eslabones tiene.
+export const SECTION_LEVEL_COUNTS = [7, 6, 2];
 
 // Rampa de caos por sección: [caos al entrar, caos al salir].
 // Los saltos entre secciones son deliberadamente más grandes que los saltos

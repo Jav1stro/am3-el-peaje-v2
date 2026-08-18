@@ -5,10 +5,12 @@
 // (de casi 0 en caos bajo a casi opaco en caos alto). La imagen de sustrato se
 // elige por profundidad de colapso; en caos alto la capa además glitchea.
 
+import { asset } from '../lib/asset';
+
 const SUBSTRATE = {
-  boot: '/maquina/maquina-boot.jpg', // sistema arrancando (caos bajo)
-  terminal: '/maquina/maquina-terminal.jpg', // descifrando (caos medio)
-  datamosh: '/maquina/maquina-datamosh.jpg', // corrupción total (caos alto)
+  boot: asset('/maquina/maquina-boot.jpg'), // sistema arrancando (caos bajo)
+  terminal: asset('/maquina/maquina-terminal.jpg'), // descifrando (caos medio)
+  datamosh: asset('/maquina/maquina-datamosh.jpg'), // corrupción total (caos alto)
 };
 
 function substrateFor(chaos) {

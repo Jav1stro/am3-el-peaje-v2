@@ -7,6 +7,8 @@ import CheckboxLevel from '../tipos-de-nivel/CheckboxLevel';
 import ImageLevel from '../tipos-de-nivel/ImageLevel';
 import DistortedLevel from '../tipos-de-nivel/DistortedLevel';
 import OptionsLevel from '../tipos-de-nivel/OptionsLevel';
+import TextLevel from '../tipos-de-nivel/TextLevel';
+import StatementLevel from '../tipos-de-nivel/StatementLevel';
 import PuzzleLevel from '../tipos-de-nivel/PuzzleLevel';
 import PrioridadesLevel from '../tipos-de-nivel/PrioridadesLevel';
 import TosLevel from '../tipos-de-nivel/TosLevel';
@@ -19,6 +21,8 @@ const LEVEL_COMPONENTS = {
   image: ImageLevel,
   distorted: DistortedLevel,
   options: OptionsLevel,
+  text: TextLevel,
+  statement: StatementLevel,
   puzzle: PuzzleLevel,
   prioridades: PrioridadesLevel,
   tos: TosLevel,

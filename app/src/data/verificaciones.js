@@ -27,6 +27,17 @@ export const VERIFICATION_POOLS = [
       steps: ['Validando entrada', 'Contrastando registros', 'Confirmando'],
     },
     { style: 'spinner', text: 'Procesando datos...', code: 'HMN-PROC-0x02', duration: 1600 },
+    { style: 'bar', text: 'Cotejando con registros públicos...', code: 'HMN-REG-0x07', duration: 1700 },
+    {
+      style: 'steps',
+      text: 'Control de integridad',
+      code: 'HMN-INT-0x09',
+      duration: 2000,
+      steps: ['Verificando sesión', 'Comprobando origen', 'Emitiendo constancia'],
+    },
+    // Última de la sección: le toca al nivel de T&C, o sea al puente hacia la
+    // sección 2. Es la espera más larga de la S1 a propósito.
+    { style: 'spinner', text: 'Aguarde. No actualice la página.', code: 'HMN-PROC-0x0C', duration: 2200 },
   ],
 
   // ── Sección 2: invasivo, analiza el interior, esperas más largas. ─────────
