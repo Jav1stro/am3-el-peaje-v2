@@ -197,6 +197,19 @@ npm run dev -- --host  # accesible desde el celular en la misma red
 npm run build        # build de producción (genera dist/)
 ```
 
+### Publicado
+
+Cada push a `main` reconstruye y publica el sitio automáticamente
+(`.github/workflows/deploy.yml`):
+
+- **https://jav1stro.github.io/am3-el-peaje-v2/** — la obra.
+- **https://jav1stro.github.io/am3-el-peaje-v2/?montaje** — el panel de montaje.
+
+Como Pages sirve desde un subdirectorio, `vite.config.js` aplica `base` sólo al
+construir (en `npm run dev` la app sigue en la raíz) y **todo lo que salga de
+`public/` tiene que pasar por `asset()`** (`src/lib/asset.js`) — una ruta escrita
+a mano como `/imagenes/foo.jpg` funciona en local y da 404 publicada.
+
 Para la impresión (opcional):
 
 ```bash
@@ -240,9 +253,9 @@ Requiere en Supabase un bucket público `dibujos`. La app lee
   carencia. Los tres lugares candidatos para construirla: el teatro de
   verificación (que las esperas muestren el costo térmico), un nivel de la S2, o
   una cláusula en los T&C.
-- **Acceso desde el celular con sensores.** La cámara y los sensores exigen HTTPS;
-  por IP local (`http://`) el navegador los bloquea. Falta resolver HTTPS (túnel
-  o deploy a Vercel) para probar cámara en un teléfono real.
+- ~~**Acceso desde el celular con sensores.**~~ Resuelto: el deploy a GitHub
+  Pages es HTTPS, así que la cámara ya se puede probar en un teléfono real desde
+  la URL publicada. Por IP local (`http://`) sigue bloqueada.
 - **Impresión en sala.** Falta crear el bucket en Supabase y dejar corriendo la
   estación de impresión en la compu con la impresora.
 - **Sección 3 finita** (cámara + dibujo). Si se suman más niveles de "cuerpo",
