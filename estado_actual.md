@@ -162,8 +162,11 @@ Ancla de cierre:
 
 ### Sección 3 — El cuerpo en juego (pool de 2)
 - `camara` — verificación facial fake con métricas biométricas.
-- `dibujo` — el visitante dibuja en su teléfono. **Ancla de cierre**; ese dibujo
-  es lo que se imprime en sala.
+- `dibujo` — *"Dibujá el vaso de agua."* El visitante dibuja en su teléfono el
+  vaso que la obra le prometió y nunca le dio (ver los T&C y CONTEXT.md → El
+  agua). **Ancla de cierre**; ese dibujo es lo que se imprime en sala, así que
+  se va con el agua en papel. Los textos del nivel se editan desde el archivo de
+  la sección (`title`, `subtitle`, `logo`).
 
 Recorrido típico: 15 niveles.
 

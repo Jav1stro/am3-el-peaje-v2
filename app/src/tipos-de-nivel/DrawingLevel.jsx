@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRecorridoStore } from '../store/useRecorridoStore';
 
-export default function DrawingLevel({ stepLabel, onDone }) {
+export default function DrawingLevel({ level, stepLabel, onDone }) {
+  const {
+    logo = 'Registro final',
+    title = 'Dibuje su identidad',
+    subtitle = 'El sistema emitirá su documento físico a partir de este registro',
+  } = level ?? {};
   const canvasRef = useRef(null);
   const drawingRef = useRef(false);
   const [hasStrokes, setHasStrokes] = useState(false);
@@ -71,11 +76,11 @@ export default function DrawingLevel({ stepLabel, onDone }) {
   return (
     <>
       <div className="card-header">
-        <div className="card-logo">Registro final · {stepLabel}</div>
-        <div className="card-title">Dibuje su identidad</div>
-        <div className="card-subtitle">
-          El sistema emitirá su documento físico a partir de este registro
+        <div className="card-logo">
+          {logo} · {stepLabel}
         </div>
+        <div className="card-title">{title}</div>
+        <div className="card-subtitle">{subtitle}</div>
       </div>
       <canvas
         ref={canvasRef}
