@@ -10,6 +10,8 @@ import {
   avisosDe,
   entradasDeSeccion,
   idDe,
+  largoDe,
+  leerMontaje,
   montajePorDefecto,
   textoDe,
   urlDeMontaje,
@@ -38,6 +40,7 @@ const ESTILOS = `
 .mtj-fila > span { min-width: 0; display: flex; align-items: baseline; gap: 6px; }
 .mtj-fila .mtj-id { font-size: 12.5px; font-weight: 600; font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .mtj-fila .mtj-txt { font-size: 11.5px; color: #80868b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mtj-total { font-size: 13px; color: #202124; }
 .mtj-tag { font-size: 10px; color: #7a2f8f; border: 1px solid #e0d3ea; border-radius: 4px;
   padding: 0 4px; white-space: nowrap; flex-shrink: 0; }
 .mtj-avisos { border: 1px solid #f0b4b4; background: #fdf3f3; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; }
@@ -54,7 +57,9 @@ const ESTILOS = `
 `;
 
 export default function PantallaMontaje() {
-  const [montaje, setMontaje] = useState(montajePorDefecto);
+  // Si la URL ya trae una configuración, el panel abre con ésa: así se puede
+  // tomar el enlace de otra persona, verlo y retocarlo.
+  const [montaje, setMontaje] = useState(() => leerMontaje() ?? montajePorDefecto());
   const avisos = useMemo(() => avisosDe(montaje), [montaje]);
   const url = useMemo(() => urlDeMontaje(montaje), [montaje]);
 
@@ -127,6 +132,8 @@ export default function PantallaMontaje() {
         const cfg = montaje.secciones[i];
         const entradas = entradasDeSeccion(i);
         const marcadas = entradas.filter((e) => cfg.ids.includes(idDe(e)));
+        // Una cadena marcada aporta tantos niveles como eslabones tiene.
+        const nivelesMarcados = marcadas.reduce((n, e) => n + largoDe(e), 0);
         return (
           <section className="mtj-sec" key={seccion.id}>
             <header>
@@ -136,14 +143,18 @@ export default function PantallaMontaje() {
                 </h2>
                 <label>
                   mostrar
-                  <input
-                    type="number"
-                    min="0"
-                    max="30"
-                    value={cfg.count}
-                    disabled={!montaje.sortear}
-                    onChange={(e) => cambiarSeccion(i, { count: Number(e.target.value) })}
-                  />
+                  {montaje.sortear ? (
+                    <input
+                      type="number"
+                      min="0"
+                      max="30"
+                      value={cfg.count}
+                      onChange={(e) => cambiarSeccion(i, { count: Number(e.target.value) })}
+                    />
+                  ) : (
+                    // En modo fijo la cantidad no se elige: es la que marcaste.
+                    <b className="mtj-total">{nivelesMarcados}</b>
+                  )}
                 </label>
               </div>
               <div className="mtj-ctrl">
