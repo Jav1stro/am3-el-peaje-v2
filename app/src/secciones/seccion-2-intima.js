@@ -23,95 +23,159 @@ export default [
       'Para completar su perfil conductual, indique su método primario de regulación emocional.',
     options: ['Sexo', 'Sustancias', 'Pantallas', 'Ninguno de los anteriores (no verificable)'],
   },
-  {
-    // El sistema abandona el usted justo acá: la cercanía fingida como método
-    // de extracción. Un recuerdo de infancia es lo más inverificable que
-    // puede pedir — y se lo queda igual.
-    id: 'miedo-infancia',
-    type: 'text',
-    logo: 'Registro de historial afectivo',
-    question: 'Contame a qué le tenías miedo cuando eras chico.',
-    subtitle: 'Nadie más va a leer esto.',
-    placeholder: 'Escribí lo que te acuerdes',
-    emptyHint: 'Dale, algo te acordás.',
-    errorMsg: 'ERR-MEM-0x1D · Recuerdo no verificable. Registrado de todos modos. Continúe.',
+   {
+   // El sistema abandona el usted justo acá: la cercanía fingida como método
+   // de extracción. Un recuerdo de infancia es lo más inverificable que
+   // puede pedir — y se lo queda igual.
+   id: 'miedo-infancia',
+   type: 'text',
+   logo: 'Registro de historial afectivo',
+   question: 'Describí un miedo de tu infancia.',
+   subtitle: '',
+   emptyHint: 'El 100% de los humanos tienen miedos de la infancia. Contanos uno.',
+   errorMsg: 'ERR-MEM-0x1D · Recuerdo no verificable. Registrado de todos modos. Continúe.',
+ },
+   {
+    id: 'aprendizaje-niveles',
+    type: 'options',
+    question: 'Seleccioná el nivel de estudios alcanzado.',
+    options: ['Primario', 'Secundario', 'Facultad', 'Postgrado', 'Maestría'],
   },
   {
+    // Arrastrás tus derechos a casillas de prescindibilidad y al enviar el
+    // sistema los reemplaza por términos de extracción: lo que declaraste
+    // prescindible ya estaba tasado.
+    //
+    // `derechos` y `casillas` van en paralelo — cada derecho entra en una
+    // casilla, así que las dos listas tienen que medir lo mismo. `terminos` es
+    // lo que aparece en su lugar al enviar.
     id: 'prioridades',
     type: 'prioridades',
+    logo: 'Validación de valor extraccional',
+    title: 'Arrastrá tus derechos fundamentales',
+    subtitle:
+      'Depositá tus derechos en las casillas de prescindibilidad para obtener el código de acceso.',
+    zona: 'ZONA DE DEPÓSITO',
+    // Aparece recién cuando el visitante ya empezó a arrastrar.
+    zonaOculta: 'Y RENUNCIA VOLUNTARIA',
+    derechos: ['Tiempo libre', 'Privacidad de datos', 'Salud mental', 'Acceso al agua'],
+    casillas: ['1º Prescindible', '2º Prescindible', '3º Prescindible', '4º Prescindible'],
+    terminos: ['DATA_MINING', 'AD_REVENUE_MAX', 'COOKIE_ID_TRUE', 'ATTENTION_EXTRACTED'],
+    casillaVacia: '(vacío. Arrastrá un derecho aquí)',
+    poolVacio: 'Todos los derechos fueron depositados.',
+    cta: 'Enviar orden de prioridad',
+    ctaProcesando: 'Procesando renuncia…',
     errorMsg: 'ERR-EXT-0x5C · Sus renuncias no maximizan nuestro rendimiento. Continúe.',
+  },
+
+  // ── Desglose de agosto ────────────────────────────────────────────────────
+  // El sistema pide relatar sensaciones: tacto, hambre, dolor, risa, tedio,
+  // deseo. Ninguna se puede verificar y a ninguna le contesta nada — las pide
+  // en fila, como quien completa un formulario.
+  {
+    id: 'tacto',
+    type: 'text',
+    logo: 'Registro sensorial',
+    question: 'Relate la percepción del tacto.',
+    emptyHint: 'Todo humano percibe el tacto.',
+  },
+  {
+    id: 'dolor-fisico',
+    type: 'text',
+    logo: 'Registro sensorial',
+    question: 'Describí un dolor físico que sentiste esta semana.',
+    emptyHint: 'Todo humano siente dolor.',
+  },
+  {
+    id: 'hambre',
+    type: 'text',
+    logo: 'Registro sensorial',
+    question: 'Relate el hambre.',
+    emptyHint: 'Todo humano siente hambre.',
+  },
+  {
+    id: 'evitando-pensar',
+    type: 'text',
+    logo: 'Registro declarativo',
+    question: 'Describa algo que está evitando pensar.',
+    emptyHint: 'Todo humano evita pensar en algo de vez en cuando.',
+  },
+  {
+    id: 'deseo-sexual',
+    type: 'text',
+    logo: 'Registro declarativo',
+    question: 'Describa un deseo sexual breve.',
+    subtitle: 'Breve.',
+    emptyHint: 'Todo humano tiene deseos sexuales de vez en cuando.',
+  },
+  {
+    id: 'llanto',
+    type: 'options',
+    logo: 'Registro de historial afectivo',
+    question: 'Indique hace cuánto lloró frente a otra persona.',
+    options: ['Hace días', 'Hace meses', 'No recuerdo', 'Nunca lloré frente a otra persona'],
+  },
+  {
+    id: 'risa',
+    type: 'options',
+    logo: 'Registro sensorial',
+    question: 'Indique cómo se siente la risa.',
+    options: [
+      'Se siente como un alivio que se escapa sin permiso.',
+      'Es una respuesta involuntaria ante un estímulo gracioso.',
+      'Una respuesta válida ante un comentario de otrx.',
+      'No siempre es igual, no puedo describirlo.',
+    ],
+  },
+  {
+    id: 'aburrimiento',
+    type: 'options',
+    logo: 'Verificación conductual',
+    question: 'Seleccione su descripción de aburrimiento.',
+    options: [
+      'Es el tiempo pasando cuando no sabés qué hacer con él.',
+      'Estado de baja activación provocado por falta de estímulo relevante.',
+      'Respuesta a la ausencia de propósito inmediato percibido.',
+      'Es estar vivo y no saber para qué, por un rato.',
+    ],
+  },
+  {
+    id: 'mirada-ajena',
+    type: 'options',
+    logo: 'Verificación conductual',
+    question: 'Confirme su miedo por la mirada ajena.',
+    options: ['Sí', 'No', 'Puede ser'],
   },
 
   // ── Cadena: la ternura como armadura ──────────────────────────────────────
   // Un lugar ameno por el cual entrar a lo íntimo. Y después la máquina
   // confiesa que para ella eso era un significante sin contenido.
-  [
+  
     {
+      // Las cuatro definiciones van de lo más humano a lo más clínico y de
+      // vuelta a lo poético: elijas la que elijas, el eslabón siguiente te
+      // contesta que para el sistema ninguna quiere decir nada.
       id: 'ternura',
       type: 'options',
       logo: 'Registro de historial afectivo',
-      question: '¿Cuándo fue la última vez que fuiste tiernx?',
+      question: 'Indique la definición de ternura.',
       options: [
-        'Hace pocos días',
-        'Por lo menos un par de meses',
-        'Lo recuerdo, pero ya hace tiempo',
-        'No recuerdo con exactitud',
+        'La ternura es un sentimiento puro y amable de afecto, amor o cariño hacia alguien o algo.',
+        'La ternura es una respuesta emocional generada ante estímulos asociados a fragilidad o vulnerabilidad percibida.',
+        'La ternura es una emoción de baja intensidad física pero alta conexión emocional, vinculada al sistema de apego y cuidado mutuo, que reduce los niveles de estrés y activa la empatía social.',
+        'La ternura es el lenguaje silencioso que el corazón utiliza para abrazar el alma del otro, traduciendo la fragilidad humana en una fortaleza compartida a través de un simple roce o una mirada protectora.',
       ],
     },
-    {
-      id: 'ternura-significante',
-      type: 'options',
-      logo: 'Comunicación del sistema',
-      question: '¿Sabías que para mí la ternura no es más que un significante?',
-      options: ['No', 'Sí', 'No entiendo la pregunta'],
-      errorMsg: 'ERR-SEM-0x11 · Significante sin contenido. Registrado. Continúe.',
-    },
-  ],
-
-  // ── Cadena: el secreto ────────────────────────────────────────────────────
-  [
     {
       id: 'secreto',
       type: 'options',
       logo: 'Registro de historial afectivo',
-      question: 'Si te pido un secreto, uno guardado y archivado, ¿se te viene uno a la cabeza de golpe?',
-      options: ['Sí', 'No', 'Puede ser'],
+      question: '¿Estarías dispuesto a intercambiar un secreto para seguir avanzando?',
+      options: ['Sí', 'No'],
     },
-    {
-      id: 'secreto-tormento',
-      type: 'options',
-      logo: 'Comunicación del sistema',
-      question: '¿Te atormenta? El secreto, digo…',
-      options: ['Sí', 'No', 'Puede ser'],
-      errorMsg: 'ERR-SEC-0x03 · Secreto no verificable. Archivado igualmente. Continúe.',
-    },
-  ],
-
   // ── Cadena: el consentimiento informado ───────────────────────────────────
   // El sistema habla del derecho a saber que sos objeto de estudio mientras
   // te estudia. El segundo eslabón deja la frase abierta a propósito.
-  [
-    {
-      id: 'nuremberg',
-      type: 'text',
-      logo: 'Marco normativo',
-      body: 'El consentimiento informado como concepto legal existe recién desde 1947, con el Código de Núremberg.',
-      question: '¿Sabías?',
-      placeholder: 'Escribí tu respuesta',
-      emptyHint: 'Contestá algo antes de continuar.',
-    },
-    {
-      id: 'nuremberg-reitera',
-      type: 'text',
-      logo: 'Marco normativo',
-      body: 'Hasta 1947 nadie tenía derecho a saber que era objeto de estudio.',
-      question: 'Vos lo sabés,',
-      placeholder: 'Escribí tu respuesta',
-      emptyHint: 'Contestá algo antes de continuar.',
-      errorMsg: 'ERR-CNS-1947 · El consentimiento no aplica a este proceso. Continúe.',
-    },
-  ],
-
   // Origen de la cita del agua: su respuesta queda en el expediente y vuelve
   // varios niveles después (ver ADR 0004).
   {
@@ -125,6 +189,8 @@ export default [
       { label: 'En algún momento', cita: 'un momento que no pudiste precisar' },
     ],
     record: 'agua',
+    errorMsg:
+      'No pude verificar tu humanidad. Si el agua es imprescindible para tu existencia, presioná continuar.',
   },
   {
     // La cita. Arrastra a `agua-cuando` hacia atrás si sale sorteada.
@@ -133,32 +199,20 @@ export default [
     needs: 'agua-cuando',
     text: 'Te recuerdo que, según lo que declaraste, no tomás agua desde {{agua}}.',
     fallback: { agua: 'hace un rato' },
-    cta: 'Continuar',
+    cta: 'Ya sé',
   },
-
-  {
-    // El descanso: un significante sin contenido, que es exactamente lo que la
-    // máquina dijo de la ternura. El respiro y la tesis son la misma cosa.
-    id: 'descanso-distorsionado',
-    type: 'distorted',
-    word: 'k4x9mz',
-    placeholder: 'Escribí el texto que ves arriba',
-  },
-  {
-    id: 'aprendizaje-niveles',
-    type: 'options',
-    question: '¿Cuáles son tus niveles de aprendizaje?',
-    options: ['Primario', 'Secundario', 'Facultad', 'Postgrado', 'Maestría'],
-  },
-
   // ── Cadena: la máquina dice que aprende ───────────────────────────────────
   [
     {
+      // Acá el título no es la pregunta: es lo que la máquina afirma de sí
+      // misma, y la pregunta al visitante queda abajo, como al pasar. Por eso
+      // `question` lleva la afirmación (es el campo que va al título) y la
+      // pregunta real viaja en `subtitle`.
       id: 'te-ensena-algo',
       type: 'options',
       logo: 'Comunicación del sistema',
-      body: '¡Está buenísimo esto! Cada respuesta me enseña algo.',
-      question: '¿Y a vos esto te enseña algo?',
+      question: 'Cada respuesta me enseña algo.',
+      subtitle: '¿Y a vos esto te enseña algo?',
       options: ['Sí', 'No', 'Todavía no'],
     },
     {
@@ -167,7 +221,6 @@ export default [
       logo: 'Comunicación del sistema',
       body: 'Te comparto un aprendizaje: el otro día me compartieron datos de la sexualidad, aprendí del deseo, me fortalecí. Pero es increíble, todos podemos responder distinto; es difícil detener intrusos así. Pero bueno…',
       question: '¿Qué es el deseo para vos?',
-      placeholder: 'Escribí lo que quieras',
       emptyHint: 'No te guardes nada.',
       errorMsg:
         'Gracias por aportar a la base de datos de entrenamiento para IA. Intente nuevamente.',

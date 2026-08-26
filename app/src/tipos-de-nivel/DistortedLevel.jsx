@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 // Texto distorsionado. Dos vías, a propósito:
 //   level.img   — imagen hecha a mano (los captchas originales del proyecto)
@@ -10,6 +10,20 @@ import { useMemo, useState } from 'react';
 // violeta de la máquina, porque los pone ella (ver "sequ1a").
 const INK = ['#1f3a93', '#1e6f3c', '#7a2f8f', '#1a5fa8', '#5c5a24', '#2f7d32'];
 const INK_MAQUINA = '#7c3aed';
+
+// Para comparar lo escrito con la palabra: se ignora lo que no hace a la
+// prueba —mayúsculas, espacios de más, tildes—, porque el captcha pide leer,
+// no ortografía.
+const normalizar = (t) =>
+  t.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+// El captcha exige la palabra exacta, pero ningún nivel bloquea (ver CLAUDE.md
+// → Lo que NO hacer). Al tercer intento fallido el sistema se da por vencido:
+// declara que no pudo verificar y lo deja pasar igual. En sala esto es lo que
+// evita que alguien que no logra leer la palabra se quede parado para siempre
+// y el recorrido no llegue nunca a la impresora.
+const INTENTOS = 3;
+const RENDICION = 'ERR-TXT-0x39 · Legibilidad no verificable. Se registra el intento. Continúe.';
 
 // Ruido determinístico: la misma palabra se deforma siempre igual, así no
 // tiembla en cada render de React.
@@ -48,7 +62,28 @@ function useDistortedWord(word) {
 export default function DistortedLevel({ level, stepLabel, onDone }) {
   const [value, setValue] = useState('');
   const [hint, setHint] = useState(null);
+  const fallidos = useRef(0);
   const drawn = useDistortedWord(level.word);
+
+  // Un nivel se corrige sólo si declara la respuesta: `answers` cuando hay más
+  // de una forma válida de leerla, o la propia `word`. Los captchas por imagen
+  // no declaran ninguna —la palabra vive adentro del JPG— y siguen aceptando
+  // cualquier cosa no vacía.
+  const esperadas = level.answers ?? (level.word ? [level.word] : null);
+
+  const verificar = () => {
+    const escrito = value.trim();
+    if (!escrito) return setHint('Escribí el texto antes de continuar.');
+    if (esperadas && !esperadas.some((r) => normalizar(r) === normalizar(escrito))) {
+      fallidos.current += 1;
+      if (fallidos.current >= INTENTOS) return onDone({ errorOverride: RENDICION });
+      const quedan = INTENTOS - fallidos.current;
+      return setHint(
+        `El texto no coincide. Te queda${quedan === 1 ? '' : 'n'} ${quedan} intento${quedan === 1 ? '' : 's'}.`
+      );
+    }
+    onDone();
+  };
 
   return (
     <>
@@ -101,15 +136,13 @@ export default function DistortedLevel({ level, stepLabel, onDone }) {
         placeholder={level.placeholder}
         autoComplete="off"
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          if (hint) setHint(null);
+        }}
       />
       {hint && <div className="error-banner">{hint}</div>}
-      <button
-        className="btn btn-primary"
-        onClick={() =>
-          value.trim() ? onDone() : setHint('Escribí el texto antes de continuar.')
-        }
-      >
+      <button className="btn btn-primary" onClick={verificar}>
         Verificar
       </button>
     </>

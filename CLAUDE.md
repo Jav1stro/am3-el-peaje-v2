@@ -52,18 +52,50 @@ descarta. `app/dist/` es el resultado del build (descartable, se regenera con
   borde de su sección, fuera del sorteo. `'first'` lo ancla al inicio, `'last'`
   al cierre. Hoy: `checkbox` abre la S1, `tos` la cierra, y `dibujo` cierra la S3.
 - `src/tipos-de-nivel/` — un componente React por mecánica (checkbox, imagen,
-  opciones, texto, declarativo, puzzle, tos, prioridades, cámara, sketch,
-  dibujo). `StatementLevel` (declarativo) es el único donde la máquina habla
-  sin pedir nada: sólo se puede continuar.
-  `OptionsLevel` lo usan S1 y S2. `DistortedLevel` acepta dos vías: `img` (una
+  opciones, texto, declarativo, puzzle, tos, prioridades, cámara, voz,
+  movimiento, sketch, dibujo). `StatementLevel` (declarativo) es el único donde
+  la máquina habla sin pedir nada: sólo se puede continuar.
+  Las tres mecánicas de cuerpo piden un permiso real del teléfono y no miden
+  nada: `CameraLevel` toma `logo`/`title`/`subtitle`/`metrics` del nivel, así
+  que la verificación facial y la lectura de emociones son el mismo componente
+  con otros textos; `VoiceLevel` (micrófono) mueve el medidor con el volumen
+  real y saca conclusiones inventadas; `MotionLevel` (acelerómetro) hace
+  inclinar el vaso hasta vaciarlo y cae solo al arrastre con el dedo si no hay
+  giroscopio (escritorio, permiso denegado). Cámara y voz se rinden a los 20s
+  si el visitante deja el diálogo de permiso sin contestar: `getUserMedia` no
+  resuelve nunca y el nivel quedaría trabado — ningún nivel bloquea.
+  `DrawingLevel` acepta
+  `guardar: false`: sólo el dibujo del vaso va al store, que es el que sale por
+  la impresora.
+  `OptionsLevel` lo usan S1 y S2. En `OptionsLevel`, `TextLevel` y
+  `StatementLevel` el campo `body` es el **preámbulo**: lo que la máquina
+  afirma antes de preguntar, y por eso se dibuja arriba del título con la clase
+  `.card-body` (texto corrido, hereda el color de la card). La cajita azul
+  `.grid-instruction` queda sólo para la instrucción del captcha —
+  imagen, cámara, voz y movimiento. `ImageLevel` acepta `grid: 'caras'` para
+  pasar a dos columnas y recorte cuadrado (los captchas de rostros).
+  `DistortedLevel` acepta dos vías: `img` (una
   imagen hecha a mano) o `word` (la palabra como dato — la dibuja el componente
-  con letras torcidas, ondas y moteado). Con `word`, los **dígitos** salen en el
+  con letras torcidas, ondas y moteado). Con `word` **corrige**: sólo avanza si
+  lo escrito coincide (ignorando mayúsculas, tildes y espacios), y si no,
+  muestra el error y deja reintentar. `answers: [...]` declara más de una
+  lectura válida (`sequ1a` acepta también `sequia`). A los **tres** intentos
+  fallidos el sistema se rinde: declara un error no verificable y avanza igual
+  —ningún nivel bloquea, ni siquiera el que corrige. Los de `img` no corrigen —
+  la palabra vive dentro del JPG — y aceptan cualquier cosa no vacía. Con `word`, los **dígitos** salen en el
   violeta de la máquina y las letras en la paleta institucional: por eso
   `sequ1a` se lee como intervenida. `TextLevel` (pregunta abierta con input) no
-  trae textos propios: el nivel le pasa `logo`, `question`, `subtitle`,
-  `placeholder` y `emptyHint`, para que la mecánica sirva a cualquier sección. El `TosLevel` (términos y condiciones) toma sus textos de
+  trae textos propios: el nivel le pasa `logo`, `question`, `subtitle` y
+  `emptyHint`, para que la mecánica sirva a cualquier sección. Su input va
+  **sin placeholder** y ningún nivel de pregunta abierta lo declara: sugerir qué
+  escribir sería darle una pista al visitante. (`placeholder` sigue existiendo
+  como prop porque los captchas de texto distorsionado lo usan como instrucción.) El `TosLevel` (términos y condiciones) toma sus textos de
   `src/data/tosText.js` (editables sin tocar el componente). `PrioridadesLevel`
-  (depositar derechos en casillas de prescindibilidad) es un nivel nativo —
+  (depositar derechos en casillas de prescindibilidad) toma **todos** sus
+  textos del nivel: `derechos`, `casillas` (van en paralelo, misma cantidad),
+  `terminos` (lo que aparece al enviar), más `logo`/`title`/`subtitle`/`zona`/
+  `zonaOculta`/`cta`. Un derecho se identifica por su posición en la lista, así
+  que editar su texto no toca ningún id. Es un nivel nativo —
   antes era un sketch en iframe; se pasó a nativo para que herede la
   degradación por caos como el resto. `SketchLevel` sigue disponible para
   sketches de p5 en iframe, aunque hoy ningún nivel lo usa.
@@ -85,7 +117,14 @@ descarta. `app/dist/` es el resultado del build (descartable, se regenera con
   (`SECTION_LEVEL_COUNTS`, se recorta al tamaño del pool), rampas de caos por
   sección y tiempos del teatro de verificación.
 - `src/store/useRecorridoStore.js` — sorteo del recorrido, índice actual,
-  avance, dibujo, cálculo de caos y progreso.
+  avance, dibujo y cálculo de caos. El sorteo cuida la **composición** en dos
+  pasos: `sortearLibres` respeta un tope de niveles de la misma mecánica por
+  sección (`SECTION_TYPE_CAPS`) y `separarMecanicas` reordena lo sorteado para
+  que no caigan dos seguidos que se jueguen igual (`SEPARAR_MECANICAS`),
+  mirando también los niveles anclados de los bordes. Las dos cosas son
+  preferencias: si el tope impide llenar la sección, se ignora; si no hay con
+  qué intercalar, se acomoda lo mejor posible. `drawRecorrido` se exporta para
+  poder medir el sorteo sin levantar la app.
 - `src/screens/LevelRouter.jsx` — registra los componentes de nivel
   (`LEVEL_COMPONENTS`) y maneja el flujo: completado → spinner → (error no
   verificable) → avance.

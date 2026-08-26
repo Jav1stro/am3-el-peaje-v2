@@ -27,7 +27,7 @@ export default function FinalScreen() {
     <div className="card">
       <div className="final-screen">
         <div className="final-check">✓</div>
-        <div className="final-title">Verificación completada</div>
+        <div className="final-title">Verificación completada. Accediste a la fuente de agua.</div>
         <div className="final-status">{status}</div>
       </div>
     </div>

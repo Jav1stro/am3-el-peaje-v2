@@ -14,7 +14,11 @@ export default function TextLevel({ level, stepLabel, onDone }) {
     question,
     subtitle,
     body,
-    placeholder = 'Escribí tu respuesta',
+    // El campo va vacío: la máquina pregunta y no ofrece nada. Un placeholder
+    // sería una pista sobre qué se espera, y acá lo que se espera es
+    // exactamente lo que no hay que sugerir. Los captchas de texto
+    // distorsionado sí lo usan, pero ahí es una instrucción, no una pista.
+    placeholder = '',
     emptyHint = 'Completá el campo antes de continuar.',
     record,
   } = level;
@@ -35,10 +39,10 @@ export default function TextLevel({ level, stepLabel, onDone }) {
         <div className="card-logo">
           {logo} · {stepLabel}
         </div>
+        {body && <div className="card-body">{body}</div>}
         <div className="card-title">{question}</div>
         {subtitle && <div className="card-subtitle">{subtitle}</div>}
       </div>
-      {body && <div className="grid-instruction">{body}</div>}
       <input
         type="text"
         className="text-input"

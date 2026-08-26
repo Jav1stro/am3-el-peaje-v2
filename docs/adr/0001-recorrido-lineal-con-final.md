@@ -30,6 +30,9 @@ niveles alcanza el final.
   discurso crítico de v2 tiene que vivir dentro de los niveles y del tono,
   no en la estructura del flujo.
 - El progreso pasa a ser real, no una promesa falsa — invierte el sentido
-  del término "Progreso" del glosario de v1.
+  del término "Progreso" del glosario de v1. **Actualización (2026-08-26): la
+  barra de progreso se sacó de la pantalla.** El recorrido sigue teniendo final
+  real, pero el visitante ya no ve cuánto le falta: la inversión respecto de v1
+  queda en la estructura, no a la vista.
 - Los ADRs de v1 no aplican a este proyecto salvo que se adopten
   explícitamente.

@@ -21,9 +21,9 @@ export default function StatementLevel({ level, stepLabel, onDone }) {
         <div className="card-logo">
           {logo} · {stepLabel}
         </div>
+        {body && <div className="card-body">{citar(body, expediente, fallback)}</div>}
         <div className="card-title">{citar(text, expediente, fallback)}</div>
       </div>
-      {body && <div className="grid-instruction">{citar(body, expediente, fallback)}</div>}
       <button className="btn btn-primary" onClick={() => onDone()}>
         {cta}
       </button>

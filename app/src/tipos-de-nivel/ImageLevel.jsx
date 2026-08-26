@@ -19,7 +19,7 @@ export default function ImageLevel({ level, stepLabel, onDone }) {
         <div className="card-title">Selección de imágenes</div>
       </div>
       <div className="grid-instruction">{level.instruction}</div>
-      <div className="image-grid">
+      <div className={`image-grid${level.grid ? ` image-grid--${level.grid}` : ''}`}>
         {level.tiles.map((src, i) => (
           <div
             key={src}

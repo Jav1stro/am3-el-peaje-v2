@@ -13,6 +13,8 @@ import PuzzleLevel from '../tipos-de-nivel/PuzzleLevel';
 import PrioridadesLevel from '../tipos-de-nivel/PrioridadesLevel';
 import TosLevel from '../tipos-de-nivel/TosLevel';
 import CameraLevel from '../tipos-de-nivel/CameraLevel';
+import VoiceLevel from '../tipos-de-nivel/VoiceLevel';
+import MotionLevel from '../tipos-de-nivel/MotionLevel';
 import SketchLevel from '../tipos-de-nivel/SketchLevel';
 import DrawingLevel from '../tipos-de-nivel/DrawingLevel';
 
@@ -27,6 +29,8 @@ const LEVEL_COMPONENTS = {
   prioridades: PrioridadesLevel,
   tos: TosLevel,
   camera: CameraLevel,
+  voice: VoiceLevel,
+  motion: MotionLevel,
   sketch: SketchLevel,
   drawing: DrawingLevel,
 };

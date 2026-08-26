@@ -11,6 +11,7 @@ export default function OptionsLevel({ level, stepLabel, onDone }) {
   const {
     logo = 'Verificación conductual',
     question,
+    subtitle,
     body,
     options,
     multi,
@@ -47,9 +48,10 @@ export default function OptionsLevel({ level, stepLabel, onDone }) {
         <div className="card-logo">
           {logo} · {stepLabel}
         </div>
+        {body && <div className="card-body">{body}</div>}
         <div className="card-title">{question}</div>
+        {subtitle && <div className="card-subtitle">{subtitle}</div>}
       </div>
-      {body && <div className="grid-instruction">{body}</div>}
       <div className="options-list">
         {options.map((o, i) => (
           <div

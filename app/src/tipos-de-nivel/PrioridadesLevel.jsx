@@ -3,19 +3,37 @@ import { useEffect, useRef, useState } from 'react';
 // Nivel nativo con drag-and-drop real (pointer events → sirve en touch y mouse).
 // Concepto intacto: arrastrás tus derechos a casillas de "prescindibilidad";
 // al enviar, el sistema convierte tus renuncias en términos de extracción.
-const RIGHTS = [
-  { id: 'tiempo', label: 'Tiempo libre' },
-  { id: 'privacidad', label: 'Privacidad de datos' },
-  { id: 'salud', label: 'Salud mental' },
-  { id: 'agua', label: 'Acceso al agua' },
-];
-const SLOT_LABELS = ['1º Prescindible', '2º Prescindible', '3º Prescindible', '4º Prescindible'];
-const INJECTION = ['DATA_MINING', 'AD_REVENUE_MAX', 'COOKIE_ID_TRUE', 'ATTENTION_EXTRACTED'];
+//
+// Todos los textos los pone el nivel (ver CONTEXT.md → Tipo de nivel). Los de
+// acá abajo son sólo el valor por defecto: los que manda son los del archivo de
+// la sección, para que se editen sin abrir este componente.
+const DERECHOS = ['Tiempo libre', 'Privacidad de datos', 'Salud mental', 'Acceso al agua'];
+const CASILLAS = ['1º Prescindible', '2º Prescindible', '3º Prescindible', '4º Prescindible'];
+const TERMINOS = ['DATA_MINING', 'AD_REVENUE_MAX', 'COOKIE_ID_TRUE', 'ATTENTION_EXTRACTED'];
 
-const labelOf = (id) => RIGHTS.find((r) => r.id === id)?.label ?? '';
+export default function PrioridadesLevel({ level, stepLabel, onDone }) {
+  const {
+    logo = 'Validación de valor extraccional',
+    title = 'Arrastrá tus derechos fundamentales',
+    subtitle = 'Depositá tus derechos en las casillas de prescindibilidad para obtener el código de acceso.',
+    zona = 'ZONA DE DEPÓSITO',
+    // Se revela recién cuando el visitante empieza a arrastrar: primero
+    // deposita, después se entera de que estaba renunciando.
+    zonaOculta = 'Y RENUNCIA VOLUNTARIA',
+    derechos = DERECHOS,
+    casillas = CASILLAS,
+    terminos = TERMINOS,
+    casillaVacia = '(vacío. Arrastrá un derecho aquí)',
+    poolVacio = 'Todos los derechos fueron depositados.',
+    cta = 'Enviar orden de prioridad',
+    ctaProcesando = 'Procesando renuncia…',
+  } = level ?? {};
 
-export default function PrioridadesLevel({ stepLabel, onDone }) {
-  const [slots, setSlots] = useState([null, null, null, null]);
+  // Un derecho se identifica por su posición en la lista: así el texto de cada
+  // uno se edita sin tocar ningún id.
+  const labelOf = (i) => derechos[i] ?? '';
+
+  const [slots, setSlots] = useState(() => casillas.map(() => null));
   const [drag, setDrag] = useState(null); // { rightId, x, y, overSlot }
   const [glitching, setGlitching] = useState(false);
   const [tick, setTick] = useState(0);
@@ -30,7 +48,9 @@ export default function PrioridadesLevel({ stepLabel, onDone }) {
   };
 
   const placed = slots.filter(Boolean);
-  const pool = RIGHTS.filter((r) => !placed.includes(r.id) && drag?.rightId !== r.id);
+  const pool = derechos
+    .map((label, i) => ({ i, label }))
+    .filter((r) => !placed.includes(r.i) && drag?.rightId !== r.i);
   const anyFilled = placed.length > 0;
   const interacting = drag !== null || anyFilled;
 
@@ -108,27 +128,27 @@ export default function PrioridadesLevel({ stepLabel, onDone }) {
   };
 
   const slotDisplay = (i) => {
-    if (glitching) return INJECTION[(i + tick) % INJECTION.length];
+    if (glitching) return terminos[(i + tick) % terminos.length];
     return slots[i] !== null ? labelOf(slots[i]).toUpperCase() : null;
   };
 
   return (
     <>
       <div className="card-header">
-        <div className="card-logo">Validación de valor extraccional · {stepLabel}</div>
-        <div className="card-title">Arrastrá tus derechos fundamentales</div>
-        <div className="card-subtitle">
-          Depositá tus derechos en las casillas de prescindibilidad para obtener el código de acceso.
+        <div className="card-logo">
+          {logo} · {stepLabel}
         </div>
+        <div className="card-title">{title}</div>
+        <div className="card-subtitle">{subtitle}</div>
       </div>
 
       <div className="grid-instruction">
-        [ ZONA DE DEPÓSITO
-        <span className={`prio-hidden${interacting ? ' revealed' : ''}`}> Y RENUNCIA VOLUNTARIA</span> ]
+        [ {zona}
+        <span className={`prio-hidden${interacting ? ' revealed' : ''}`}> {zonaOculta}</span> ]
       </div>
 
       <div className="prio-slots">
-        {SLOT_LABELS.map((label, i) => {
+        {casillas.map((label, i) => {
           const content = slotDisplay(i);
           const filled = content !== null;
           const isOver = drag && drag.overSlot === i;
@@ -146,7 +166,7 @@ export default function PrioridadesLevel({ stepLabel, onDone }) {
                   {content} <span className="prio-lock">🔒</span>
                 </span>
               ) : (
-                <span className="prio-slot-empty">(vacío. Arrastrá un derecho aquí)</span>
+                <span className="prio-slot-empty">{casillaVacia}</span>
               )}
             </div>
           );
@@ -156,21 +176,21 @@ export default function PrioridadesLevel({ stepLabel, onDone }) {
       <div className="prio-pool">
         {pool.map((r) => (
           <div
-            key={r.id}
+            key={r.i}
             className="prio-chip"
-            onPointerDown={(e) => startDrag(e, r.id)}
+            onPointerDown={(e) => startDrag(e, r.i)}
           >
             <span className="prio-grip">⣿</span>
             {r.label}
           </div>
         ))}
         {pool.length === 0 && !drag && !glitching && (
-          <div className="prio-pool-empty">Todos los derechos fueron depositados.</div>
+          <div className="prio-pool-empty">{poolVacio}</div>
         )}
       </div>
 
       <button className="btn btn-primary" disabled={!anyFilled || glitching} onClick={submit}>
-        {glitching ? 'Procesando renuncia…' : 'Enviar orden de prioridad'}
+        {glitching ? ctaProcesando : cta}
       </button>
 
       {drag && (

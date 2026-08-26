@@ -26,10 +26,16 @@ const ESTILOS = `
 .mtj-modo button { flex: 1; padding: 8px 12px; border-radius: 8px; cursor: pointer;
   border: 1px solid #dadce0; background: #fff; font-size: 12.5px; }
 .mtj-modo button.on { border-color: #1a73e8; background: #e8f0fe; font-weight: 600; }
+.mtj-separar { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #3c4043;
+  margin: -8px 0 16px; cursor: pointer; }
+.mtj-separar input { width: 15px; height: 15px; margin: 0; }
 .mtj-sec { border: 1px solid #dadce0; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
 .mtj-sec > header { padding: 10px 14px; background: #f8f9fa; border-bottom: 1px solid #dadce0; }
 .mtj-cab { display: flex; align-items: center; gap: 10px; }
 .mtj-sec h2 { font-size: 13.5px; margin: 0; flex: 1; }
+.mtj-todos { width: 15px; height: 15px; flex-shrink: 0; margin: 0; cursor: pointer; }
+.mtj-cuenta { font-weight: 400; font-size: 11.5px; color: #80868b; margin-left: 7px;
+  font-family: ui-monospace, Menlo, monospace; }
 .mtj-sec label { font-size: 12px; color: #5f6368; display: flex; align-items: center; gap: 5px; }
 .mtj-ctrl { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
 .mtj-sec input[type=number] { width: 48px; padding: 3px 6px; border: 1px solid #dadce0; border-radius: 6px; font-size: 12.5px; }
@@ -43,6 +49,11 @@ const ESTILOS = `
 .mtj-total { font-size: 13px; color: #202124; }
 .mtj-tag { font-size: 10px; color: #7a2f8f; border: 1px solid #e0d3ea; border-radius: 4px;
   padding: 0 4px; white-space: nowrap; flex-shrink: 0; }
+/* El tipo de nivel: la mecánica con la que se juega. Va apagado y en monoespaciada
+   para que se lea como metadato y no compita con el id ni con el texto. */
+.mtj-tipo { font-size: 10px; color: #5f6368; background: #f1f3f4; border-radius: 4px;
+  padding: 1px 5px; white-space: nowrap; flex-shrink: 0;
+  font-family: ui-monospace, Menlo, monospace; }
 .mtj-avisos { border: 1px solid #f0b4b4; background: #fdf3f3; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; }
 .mtj-avisos li { font-size: 12px; color: #a52222; line-height: 1.45; margin-left: 16px; }
 .mtj-pie { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #dadce0;
@@ -86,6 +97,24 @@ export default function PantallaMontaje() {
       }),
     }));
 
+  // Marca o desmarca la sección entera. Si ya estaba completa, la vacía.
+  const alternarSeccion = (i) =>
+    setMontaje((m) => ({
+      ...m,
+      secciones: m.secciones.map((s, j) => {
+        if (j !== i) return s;
+        const todos = entradasDeSeccion(i).map(idDe);
+        const ids = todos.every((id) => s.ids.includes(id)) ? [] : todos;
+        return {
+          ...s,
+          ids,
+          // Al vaciar la sección, lo que era ancla deja de existir.
+          apertura: ids.includes(s.apertura) ? s.apertura : null,
+          cierre: ids.includes(s.cierre) ? s.cierre : null,
+        };
+      }),
+    }));
+
   const empezar = () => {
     window.location.search = url;
   };
@@ -118,6 +147,17 @@ export default function PantallaMontaje() {
         </button>
       </div>
 
+      {montaje.sortear && (
+        <label className="mtj-separar">
+          <input
+            type="checkbox"
+            checked={montaje.separar}
+            onChange={() => setMontaje((m) => ({ ...m, separar: !m.separar }))}
+          />
+          Separar mecánicas: que no caigan dos niveles seguidos que se jueguen igual
+        </label>
+      )}
+
       {avisos.length > 0 && (
         <div className="mtj-avisos">
           <ul>
@@ -138,8 +178,22 @@ export default function PantallaMontaje() {
           <section className="mtj-sec" key={seccion.id}>
             <header>
               <div className="mtj-cab">
+                <input
+                  type="checkbox"
+                  className="mtj-todos"
+                  title="Marcar o desmarcar todos los niveles de la sección"
+                  checked={marcadas.length === entradas.length}
+                  // Ni todas ni ninguna: el check queda a medio camino.
+                  ref={(el) => {
+                    if (el) el.indeterminate = marcadas.length > 0 && marcadas.length < entradas.length;
+                  }}
+                  onChange={() => alternarSeccion(i)}
+                />
                 <h2>
                   {i + 1}. {seccion.name}
+                  <span className="mtj-cuenta">
+                    {marcadas.length}/{entradas.length}
+                  </span>
                 </h2>
                 <label>
                   mostrar
@@ -156,6 +210,18 @@ export default function PantallaMontaje() {
                     <b className="mtj-total">{nivelesMarcados}</b>
                   )}
                 </label>
+                {montaje.sortear && (
+                  <label title="Cuántos niveles de la misma mecánica puede traer la sección. 0 = sin tope.">
+                    máx. igual
+                    <input
+                      type="number"
+                      min="0"
+                      max="9"
+                      value={cfg.tope ?? 0}
+                      onChange={(e) => cambiarSeccion(i, { tope: Number(e.target.value) })}
+                    />
+                  </label>
+                )}
               </div>
               <div className="mtj-ctrl">
                 {['apertura', 'cierre'].map((cual) => (
@@ -185,6 +251,7 @@ export default function PantallaMontaje() {
                   <input type="checkbox" checked={on} onChange={() => alternar(i, info.id)} />
                   <span>
                     <span className="mtj-id">{info.id}</span>
+                  <span className="mtj-tipo">{info.tipo}</span>
                     {info.cadena && <span className="mtj-tag">cadena ×{info.largo}</span>}
                     {cfg.apertura === info.id && <span className="mtj-tag">abre</span>}
                     {cfg.cierre === info.id && <span className="mtj-tag">cierra</span>}

@@ -1,6 +1,6 @@
 # El Peaje v2 — Estado actual
 
-_Última actualización: 2026-07-02_
+_Última actualización: 2026-08-26_
 
 Instantánea del proyecto para quien llega nuevo (o para retomarlo más adelante).
 Para el detalle conceptual ver [`CONTEXT.md`](./CONTEXT.md) (glosario de dominio),
@@ -51,14 +51,14 @@ am3-el-peaje-v2/
 │   └── 0004-el-expediente.md
 ├── app/                    # La aplicación (React + Vite)
 │   ├── public/
-│   │   ├── imagenes/       # Assets de los captchas (semáforos, agua, puzzle…)
+│   │   ├── imagenes/       # Assets de los captchas (fuentes, rostros, puzzle…)
 │   │   ├── maquina/        # Imágenes de la "máquina" (boot/terminal/datamosh)
 │   │   └── sketches/lib/   # p5.js + peaje-chaos.js (para futuros sketches)
 │   └── src/
 │       ├── secciones/      # QUÉ niveles tiene cada sección (pools)
 │       ├── tipos-de-nivel/ # CÓMO se juega cada mecánica (un componente c/u)
 │       ├── screens/        # LevelRouter (flujo) + FinalScreen
-│       ├── components/     # Hud, MachineLayer, NoiseCanvas, ProcessingOverlay
+│       ├── components/     # MachineLayer, NoiseCanvas, ProcessingOverlay
 │       ├── data/           # recorridoConfig, verificaciones, tosText
 │       ├── store/          # useRecorridoStore (Zustand)
 │       ├── lib/            # supabase, printRelay
@@ -74,6 +74,11 @@ mecánicas se comparten entre secciones, por eso viven aparte.
 
 ## Cómo funciona el recorrido
 
+0. **El sorteo cuida la composición.** Además de elegir qué niveles entran,
+   evita la monotonía: un tope de niveles de la misma mecánica por sección
+   (`SECTION_TYPE_CAPS`, hoy `[2, 2, 1]`) y un reordenamiento que impide que
+   dos niveles que se jueguen igual caigan seguidos. Ambas cosas se configuran
+   desde el panel de montaje.
 1. **Secciones en orden fijo, niveles sorteados.** Cada sección tiene un pool;
    al entrar se sortean N niveles (config en `data/recorridoConfig.js`). Recargar
    la página = empezar de cero (no se persiste; es decisión de obra).
@@ -94,7 +99,7 @@ mecánicas se comparten entre secciones, por eso viven aparte.
 |---|---|---|---|
 | 1 | Verificación mecánica | 7 | 0 → 3 |
 | 2 | Extracción de lo íntimo | 6 | 5 → 7 |
-| 3 | El cuerpo en juego | 2 | 8 → 9 |
+| 3 | El cuerpo en juego | 4 | 8 → 9 |
 
 Los saltos de caos grandes ocurren **al cambiar de sección** (se siente, no se
 anuncia).
@@ -103,30 +108,38 @@ anuncia).
 
 ## Secciones y niveles
 
-### Sección 1 — Verificación mecánica (pool de 12, muestra 7)
+### Sección 1 — Verificación mecánica (pool de 9, muestra 7)
 
 El agua entra acá como **trámite**, no como disputa: se mezcla con niveles
-neutros que sostienen la fachada. La proporción (3 neutros / 7 de agua entre los
-sorteables) es deliberada — ver CONTEXT.md → El agua.
+neutros que sostienen la fachada. La proporción (hoy 3 neutros y 4 de agua entre
+los siete sorteables) es deliberada — ver CONTEXT.md → El agua. **Ojo: quedó
+dada vuelta** respecto del arranque (eran 3 neutros / 7 de agua sobre un pool
+más grande), y con 7 sorteables para 5 lugares casi no hay sorteo — dos
+visitantes ven prácticamente lo mismo.
 
 - `checkbox` — "No soy un robot". **Ancla de apertura** (siempre primero).
-- `semaforos` — selección de imágenes. Neutro: es la cara del captcha genérico.
 - `puzzle` — ordenar 9 fragmentos. Neutro.
-- `distorsionado-1`, `distorsionado-2` — texto distorsionado por imagen (JPG).
-  Neutros.
-- `agua` — selección de imágenes.
-- `fuente-agua` — selección de imágenes: "una fuente de agua potable".
-  **Usa fotos provisorias** (las de `agua`) hasta que lleguen las definitivas.
+- `fuente-agua` — selección de imágenes: "una fuente de agua potable". Las ocho
+  definitivas del desglose de agosto: embotelladora, data center, aspersores,
+  salto, plataforma petrolera, desagüe al mar, laguna salada y duna. Ninguna es
+  una fuente de la que se pueda tomar — el agua aparece como infraestructura,
+  como mercancía o como ausencia.
+- `persona-real-1`, `persona-real-2` — *"¿Cuál es una persona real?"*, cuatro
+  rostros cada uno, en grilla de 2×2. Ninguno existe: son caras generadas. El
+  error no verificable lo dice después de que elegiste. Se sortean por separado:
+  con que salga uno, el remate ya se dijo.
 - `sed`, `sequia`, `polidipsia` — texto distorsionado **generado por la app**
   (`word`, no `img`). Son una escalada —tu sed, la del mundo, el diagnóstico—
   pero el sorteo no garantiza ni que salgan las tres ni el orden: cada una se
-  lee sola. En `sequ1a` el `1` va en el violeta de la máquina.
-- `pregunta-agua` — opción múltiple (error no verificable).
+  lee sola. En `sequ1a` el `1` va en el violeta de la máquina. Los tres
+  **corrigen**: sólo avanzan con la palabra correcta, y a los tres intentos
+  fallidos el sistema se rinde y deja pasar. Son los únicos captchas de texto
+  distorsionado que quedan, así que toda esa mecánica habla de agua.
 - `tos` — Términos y Condiciones que crecen con adendas al scrollear. **Ancla de
   cierre** (transición hacia la sección 2). El párrafo final se resalta con un
   adelanto de la estética violeta.
 
-### Sección 2 — Extracción de lo íntimo (pool de 17, muestra 6)
+### Sección 2 — Extracción de lo íntimo (pool de 23 entradas, muestra 6)
 
 Sueltos:
 - `emociones` — opción múltiple (error no verificable).
@@ -140,28 +153,56 @@ Sueltos:
 - `descanso-distorsionado` — texto distorsionado sin significado. Es el respiro
   y a la vez la tesis: un significante sin contenido.
 - `aprendizaje-niveles` — opción múltiple, tono de formulario.
+- Del **desglose de agosto**, una fila de sensaciones que el sistema pide
+  relatar y a las que no contesta nada: `tacto`, `hambre`, `dolor-fisico`,
+  `evitando-pensar` y `deseo-sexual` (preguntas abiertas), `llanto`, `risa`,
+  `aburrimiento` y `mirada-ajena` (opción múltiple). En `risa` y `aburrimiento`
+  las cuatro opciones van de lo poético a lo clínico: elijas la que elijas, para
+  el sistema es un dato.
 
 Cadenas (entran juntas y en orden; el error va siempre en el último eslabón):
-- **ternura** → *"¿sabías que para mí la ternura no es más que un significante?"*
+- **ternura**: *"Indique la definición de ternura"* (las cuatro definiciones del
+  desglose, de lo humano a lo clínico) → *"¿sabías que para mí la ternura no es
+  más que un significante?"*
 - **secreto** → *"¿te atormenta? el secreto, digo…"*
 - **Núremberg** (consentimiento informado desde 1947) → *"vos lo sabés,"*
 - **"¿y a vos esto te enseña algo?"** → el deseo. Su error es el agradecimiento
   por aportar a la base de datos de entrenamiento.
 
 Con dependencia:
+- `pregunta-agua` — vino de la S1. **Hace la misma pregunta que `agua-cuando`**
+  y ahora comparten sección: el sorteo puede traer las dos y el visitante
+  contestaría dos veces lo mismo. Pendiente de resolver.
 - `agua-cuando` — cuándo tomaste agua por última vez; su respuesta va al
   **expediente**.
+  Su error no verificable es el del desglose: *"No pude verificar tu humanidad.
+  Si el agua es imprescindible para tu existencia, presioná continuar."*
 - `agua-recordatorio` — nivel **declarativo** que te cita: *"no tomás agua desde
-  hace más de tres horas"*. Declara `needs: 'agua-cuando'`, así que arrastra a
-  la pregunta y el sorteo las separa lo más posible (hoy, 4 niveles en el medio).
+  hace más de tres horas"*. Se contesta con **"Ya sé"**. Declara
+  `needs: 'agua-cuando'`, así que arrastra a la pregunta y el sorteo las separa
+  lo más posible.
 
 Ancla de cierre:
 - `quien-es-mas-maquina` — la tesis de la obra, fuera del sorteo: *"si los dos
   necesitamos de agua para existir y sabemos comunicarnos, ¿quién es más máquina
   y quién más humano?"* Justo antes de que la S3 te pida el cuerpo.
 
-### Sección 3 — El cuerpo en juego (pool de 2)
+### Sección 3 — El cuerpo en juego (pool de 6, muestra 4)
+
+Las cuatro mecánicas de cuerpo del desglose. Todas piden un permiso real del
+teléfono y ninguna mide nada: el sensor es verdadero, la lectura la inventa el
+sistema.
+
 - `camara` — verificación facial fake con métricas biométricas.
+- `emociones-cara` — mismo componente, otra excusa: dice inferir tu estado
+  afectivo. Su error avisa que tu cara no coincide con lo que declaraste.
+- `cansancio-voz` — pide un suspiro. El medidor se mueve con el volumen real del
+  micrófono; la "fatiga vocal" es inventada.
+- `movimiento` — acelerómetro: hay que inclinar el teléfono hasta vaciar el
+  vaso. Por fin te dan el vaso y lo primero que te piden es volcarlo. Sin
+  giroscopio (escritorio, permiso denegado) cae solo al arrastre con el dedo.
+- `dibujo-felicidad` — *"Dibujá la felicidad."* Usa el mismo componente que el
+  dibujo final pero con `guardar: false`: no pisa el dibujo que se imprime.
 - `dibujo` — *"Dibujá el vaso de agua."* El visitante dibuja en su teléfono el
   vaso que la obra le prometió y nunca le dio (ver los T&C y CONTEXT.md → El
   agua). **Ancla de cierre**; ese dibujo es lo que se imprime en sala, así que
@@ -243,9 +284,6 @@ Requiere en Supabase un bucket público `dibujos`. La app lee
   `app/src/montaje/` y las líneas marcadas con `// montaje:` en `src/main.jsx`
   y `src/store/useRecorridoStore.js`. Un visitante que entra por el QR nunca la
   ve, pero mientras exista está en el build.
-- **Fotos de `fuente-agua`.** Faltan las 6 definitivas; hoy el nivel usa las de
-  `agua` como provisorias. Van en `public/imagenes/` como `img_fuente_1..6.jpg`
-  y se cambia una línea en `secciones/seccion-1-mecanica.js`.
 - **El recelo de la máquina está enunciado, no construido.** El glosario dice
   que la máquina necesita el agua para enfriar servidores y sostener su
   inteligencia. En la obra eso aparece **una sola vez**: la premisa *"si los dos
@@ -261,8 +299,11 @@ Requiere en Supabase un bucket público `dibujos`. La app lee
   la URL publicada. Por IP local (`http://`) sigue bloqueada.
 - **Impresión en sala.** Falta crear el bucket en Supabase y dejar corriendo la
   estación de impresión en la compu con la impresora.
-- **Sección 3 finita** (cámara + dibujo). Si se suman más niveles de "cuerpo",
-  subir el conteo en `recorridoConfig.js`.
+- **Sección 3: sonido y umbrales a ojo.** Las cuatro mecánicas de cuerpo están
+  implementadas, pero los parámetros se eligieron sin probarlos con un cuerpo
+  real: cuántos segundos escucha `cansancio-voz`, cuántos grados y cuánto tiempo
+  pide `movimiento` para vaciar el vaso. Se ajustan en las constantes al tope de
+  `VoiceLevel.jsx` y `MotionLevel.jsx`.
 - **Verificación en dispositivo real.** El trabajo se validó con capturas
   estáticas (Chrome headless) usando el CSS real; las animaciones y el
   drag-and-drop conviene probarlos con el dedo en un teléfono.
@@ -271,7 +312,9 @@ Requiere en Supabase un bucket público `dibujos`. La app lee
 
 **Descartado**
 - Los juegos `volcar-el-vaso` y `agua-juego` (sketches de p5) se sacaron de la
-  obra.
+  obra. Volcar el vaso **volvió** en el desglose de agosto, pero como nivel
+  nativo (`movimiento`, con acelerómetro), no como sketch en iframe: así hereda
+  la degradación por caos como el resto.
 
 ---
 

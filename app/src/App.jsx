@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useRecorridoStore } from './store/useRecorridoStore';
-import Hud from './components/Hud';
 import NoiseCanvas from './components/NoiseCanvas';
 import MachineLayer from './components/MachineLayer';
 import LevelRouter from './screens/LevelRouter';
@@ -20,7 +19,6 @@ export default function App() {
     <>
       <MachineLayer chaos={chaos} />
       <NoiseCanvas chaos={chaos} />
-      <Hud />
       {finished ? <FinalScreen /> : <LevelRouter />}
     </>
   );

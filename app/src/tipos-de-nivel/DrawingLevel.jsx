@@ -6,6 +6,10 @@ export default function DrawingLevel({ level, stepLabel, onDone }) {
     logo = 'Registro final',
     title = 'Dibuje su identidad',
     subtitle = 'El sistema emitirá su documento físico a partir de este registro',
+    cta = 'Emitir documento',
+    // Sólo el dibujo que se imprime va al store. Cualquier otro nivel de
+    // dibujo es un trámite más y no debe pisar el que sale por la impresora.
+    guardar = true,
   } = level ?? {};
   const canvasRef = useRef(null);
   const drawingRef = useRef(false);
@@ -69,7 +73,7 @@ export default function DrawingLevel({ level, stepLabel, onDone }) {
 
   const submit = () => {
     if (!hasStrokes) return setHint('El registro gráfico no puede estar vacío.');
-    setDrawing(canvasRef.current.toDataURL('image/png'));
+    if (guardar) setDrawing(canvasRef.current.toDataURL('image/png'));
     onDone();
   };
 
@@ -92,7 +96,7 @@ export default function DrawingLevel({ level, stepLabel, onDone }) {
       />
       {hint && <div className="error-banner">{hint}</div>}
       <button className="btn btn-primary" onClick={submit}>
-        Emitir documento
+        {cta}
       </button>
       <button className="btn btn-secondary" onClick={clear}>
         Borrar

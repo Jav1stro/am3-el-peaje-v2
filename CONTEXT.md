@@ -43,6 +43,14 @@ sección. El pool puede ser más grande que la cantidad de niveles que se
 presentan: dos visitantes (o dos visitas) pueden ver niveles distintos de la
 misma sección.
 
+El sorteo no es puramente azaroso: cuida la **composición** del recorrido. Una
+sección no trae más de unos pocos niveles de la misma mecánica, y los que
+comparten mecánica no caen seguidos — un pool desparejo (muchos niveles de
+opciones, uno solo de arrastrar) haría que el azar solo entregara visitas
+monótonas. Es una preferencia, no una regla dura: si respetarla dejaría la
+sección con menos niveles de los previstos, la sección se llena igual.
+_Evitar_: azar puro, aleatorio (el sorteo elige, pero no a ciegas)
+
 ---
 
 ## Nivel

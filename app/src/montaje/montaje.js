@@ -10,7 +10,11 @@
 // enlace se le puede pasar a otra persona para que vea exactamente lo mismo.
 
 import { ENTRADAS, cabezaDe, nivelesDe } from '../secciones';
-import { SECTION_LEVEL_COUNTS } from '../data/recorridoConfig';
+import {
+  SECTION_LEVEL_COUNTS,
+  SECTION_TYPE_CAPS,
+  SEPARAR_MECANICAS,
+} from '../data/recorridoConfig';
 
 // Una cadena se identifica por el id de su primer eslabón: es una unidad.
 export const idDe = (entrada) => cabezaDe(entrada).id;
@@ -23,7 +27,11 @@ export const entradasDeSeccion = (section) => ENTRADAS.filter((e) => seccionDe(e
 // recordar de qué se trata.
 export function textoDe(entrada) {
   const l = cabezaDe(entrada);
-  const propio = l.question ?? l.instruction ?? l.text ?? l.body ?? l.word ?? '';
+  // `title` va en la lista porque las mecánicas de cuerpo y de dibujo no tienen
+  // pregunta: sin él, media sección 3 se lista sin una sola palabra y no se
+  // distingue `dibujo` de `dibujo-felicidad`, ni `camara` de `emociones-cara`.
+  const propio =
+    l.question ?? l.instruction ?? l.text ?? l.body ?? l.word ?? l.title ?? l.subtitle ?? '';
   const cola = nivelesDe(entrada).slice(1).map((n) => n.id);
   return {
     id: l.id,
@@ -37,11 +45,13 @@ export function textoDe(entrada) {
 export function montajePorDefecto() {
   return {
     sortear: true,
+    separar: SEPARAR_MECANICAS,
     secciones: SECTION_LEVEL_COUNTS.map((count, s) => {
       const entradas = entradasDeSeccion(s);
       const conAncla = (a) => entradas.find((e) => cabezaDe(e).anchor === a);
       return {
         count,
+        tope: SECTION_TYPE_CAPS[s],
         ids: entradas.map(idDe),
         apertura: conAncla('first') ? idDe(conAncla('first')) : null,
         cierre: conAncla('last') ? idDe(conAncla('last')) : null,
@@ -54,17 +64,20 @@ export function montajePorDefecto() {
 
 export function leerMontaje(search = window.location.search) {
   const p = new URLSearchParams(search);
-  const hayAlgo = [0, 1, 2].some((i) => p.has(`s${i}`)) || p.has('fijo');
+  const hayAlgo = [0, 1, 2].some((i) => p.has(`s${i}`)) || p.has('fijo') || p.has('sep');
   if (!hayAlgo) return null;
 
   const base = montajePorDefecto();
   return {
     sortear: p.get('fijo') !== '1',
+    separar: p.get('sep') !== '0',
     secciones: base.secciones.map((def, i) => {
       const ids = p.get(`s${i}`);
       const [apertura, cierre] = (p.get(`a${i}`) ?? '').split(':');
       return {
         count: p.has(`n${i}`) ? Number(p.get(`n${i}`)) : def.count,
+        // 0 = sin tope.
+        tope: p.has(`t${i}`) ? Number(p.get(`t${i}`)) : def.tope,
         ids: ids === null ? def.ids : ids === '' ? [] : ids.split(','),
         apertura: apertura || null,
         cierre: cierre || null,
@@ -78,9 +91,11 @@ export function urlDeMontaje(montaje) {
   montaje.secciones.forEach((s, i) => {
     p.set(`s${i}`, s.ids.join(','));
     p.set(`n${i}`, String(s.count));
+    p.set(`t${i}`, String(s.tope ?? 0));
     p.set(`a${i}`, `${s.apertura ?? ''}:${s.cierre ?? ''}`);
   });
   if (!montaje.sortear) p.set('fijo', '1');
+  if (!montaje.separar) p.set('sep', '0');
   return `?${p.toString()}`;
 }
 
@@ -135,6 +150,26 @@ export function avisosDe(montaje) {
     if (disponibles < s.count) {
       avisos.push(
         `La sección ${i + 1} pide ${s.count} niveles y sólo hay ${disponibles} marcados: se van a ver ${disponibles}.`
+      );
+      return;
+    }
+    // Un tope demasiado bajo no puede llenar la sección. El sorteo lo ignora
+    // antes que dejarla corta, pero conviene decirlo: el número que se ve en
+    // pantalla no es el que va a mandar.
+    if (!s.tope) return;
+    const marcadas = entradasDeSeccion(i).filter((e) => s.ids.includes(idDe(e)));
+    const fijos = marcadas
+      .filter((e) => idDe(e) === s.apertura || idDe(e) === s.cierre)
+      .reduce((n, e) => n + largoDe(e), 0);
+    const porTipo = {};
+    marcadas
+      .filter((e) => idDe(e) !== s.apertura && idDe(e) !== s.cierre)
+      .forEach((e) => nivelesDe(e).forEach((l) => (porTipo[l.type] = (porTipo[l.type] ?? 0) + 1)));
+    const techo = Object.values(porTipo).reduce((n, c) => n + Math.min(s.tope, c), 0);
+    const lugares = Math.max(0, s.count - fijos);
+    if (techo < lugares) {
+      avisos.push(
+        `El tope de ${s.tope} por mecánica no alcanza para los ${lugares} lugares de la sección ${i + 1} (llega a ${techo}): el sorteo lo va a superar para no dejarla corta.`
       );
     }
   });
