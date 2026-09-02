@@ -1,7 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// HERRAMIENTA DE DESARROLLO — NO ES PARTE DE LA OBRA. Se borra antes de la sala.
-// Para sacarla: borrar esta carpeta y los dos enganches marcados con "montaje"
-// (uno en src/main.jsx, otro en src/store/useRecorridoStore.js).
+// MONTAJE — la lógica de cómo queda armada la obra para una función (CONTEXT.md).
+// No es parte de la obra, pero sí del dispositivo: viaja a la sala, porque es
+// con esto que se monta la función. Para sacarlo: borrar esta carpeta y los dos
+// enganches marcados con "montaje" (uno en src/main.jsx, otro en
+// src/store/useRecorridoStore.js).
 // ─────────────────────────────────────────────────────────────────────────────
 //
 // Permite decidir, por sección, qué niveles entran y cuáles abren y cierran.

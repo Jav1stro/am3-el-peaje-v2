@@ -236,3 +236,24 @@ trámite no guarda tu lugar.
 _Evitar_: sesión, checkpoint, guardado
 
 ---
+
+## Montaje
+
+Cómo queda armada la obra para una función determinada: qué niveles entran en
+cada sección, si se sortean o van fijos y en orden, y cuáles son los **niveles
+de transición** que abren y cierran cada sección. El montaje viaja entero en la
+URL — pasarle el enlace a alguien es pasarle la misma obra — y no se guarda en
+ningún lado: convive con **empezar de cero**, porque fija de qué está hecho el
+recorrido pero no dónde quedó el visitante.
+_Evitar_: configuración, preset, sesión
+
+---
+
+## Panel de montaje
+
+La pantalla donde se arma el **montaje**. No es parte de la obra —el visitante
+no llega nunca ahí— pero sí del dispositivo: es la herramienta con la que se
+monta la función, de pie en la sala y desde un teléfono, antes de abrir.
+_Evitar_: panel de desarrollo, herramienta de debug, admin
+
+---

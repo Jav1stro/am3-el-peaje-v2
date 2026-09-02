@@ -196,6 +196,39 @@ glitch en caos alto y temblor de pantalla (`screen-shake` sobre `#root`) sólo
 en caos 9. Para volver al enfoque de grietas descartado, ver ADR 0003 — se
 cambia sólo el CSS de `.machine-layer` y el componente.
 
+## Panel de montaje (`app/src/montaje/`)
+
+El **montaje** (ver CONTEXT.md) es cómo queda armada la obra para una función:
+qué niveles entran en cada sección, si se sortean o van fijos, y cuáles abren y
+cierran. Viaja entero en la URL y no se guarda en ningún lado — convive con
+*empezar de cero*. `montaje.js` es la lógica (la lee el store); el **panel de
+montaje** (`PantallaMontaje.jsx`, en `?montaje`) es la pantalla donde se arma.
+
+No es parte de la obra —el visitante no llega nunca ahí— pero sí del
+dispositivo: **viaja a la sala y no se borra**, porque es con esto que se monta
+la función, de pie y desde un teléfono, antes de abrir. Para sacarlo alguna vez:
+borrar la carpeta y los dos enganches marcados con `montaje` (uno en `main.jsx`,
+otro en `useRecorridoStore.js`).
+
+- **La obra y el panel no comparten una sola regla de CSS.** `main.jsx` importa
+  `base.css` o `montaje.css` de forma dinámica, nunca los dos: el panel heredaba
+  el `body` flex-centrado y el `100dvh` de la obra, que le recortaban el
+  encabezado y le rompían el ancho. Por eso `montaje.css` trae su propio reset.
+- Se opera con el pulgar: blancos táctiles de 44px, e inputs de **16px como
+  mínimo** — con menos, Safari en iOS hace zoom al enfocarlos y el
+  `user-scalable=no` del `index.html` ya no lo evita.
+- **Sin `@media`**, como la obra: mobile-first y un solo comportamiento. En
+  pantallas grandes sólo actúa el `max-width`.
+- **Nada de `title=` para explicar un control**: el tooltip nativo sólo aparece
+  al pasar el mouse por encima, y en un teléfono no hay hover — la explicación
+  quedaría invisible justo donde se usa el panel. Lo que necesite explicarse
+  lleva un botón `?` (`.mtj-ayuda`) que abre una nota al tocarlo.
+- Las tres secciones son plegables y arrancan cerradas, así las tres cabeceras
+  entran juntas en una pantalla. El pliegue no viaja en la URL: la URL lleva el
+  montaje, abrir una sección es estado de mirada.
+- El panel **no usa el azul institucional**: tiene neutros propios en
+  `montaje.css` para que en penumbra se distinga de la obra de un vistazo.
+
 ## Estación de impresión (`print-station/`)
 
 Corre en la compu de sala con la impresora USB. Escucha el canal

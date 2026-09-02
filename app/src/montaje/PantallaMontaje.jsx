@@ -1,11 +1,19 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// HERRAMIENTA DE DESARROLLO — NO ES PARTE DE LA OBRA. Se borra antes de la sala.
-// Los estilos van acá adentro a propósito: nada de esto toca base.css, así que
-// borrar la carpeta no deja rastros.
+// PANEL DE MONTAJE — la pantalla donde se arma el montaje (CONTEXT.md).
+// No es parte de la obra: el visitante no llega nunca acá. Pero sí del
+// dispositivo — es la herramienta con la que se monta la función, de pie en la
+// sala y desde un teléfono, antes de abrir. Por eso viaja con la obra y no se
+// borra: si alguna vez se saca, es borrando src/montaje/ entera y los dos
+// enganches marcados con "montaje" (uno en src/main.jsx, otro en
+// src/store/useRecorridoStore.js).
+//
+// Los estilos viven en montaje.css, al lado. No tocan base.css ni lo heredan:
+// main.jsx carga uno u otro, nunca los dos.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useMemo, useState } from 'react';
 import { SECTIONS } from '../secciones';
+import './montaje.css';
 import {
   avisosDe,
   entradasDeSeccion,
@@ -17,62 +25,24 @@ import {
   urlDeMontaje,
 } from './montaje';
 
-const ESTILOS = `
-.mtj { max-width: 720px; margin: 0 auto; padding: 24px 16px 64px;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: #202124; }
-.mtj h1 { font-size: 17px; margin: 0 0 14px; }
-.mtj h1 span { font-weight: 400; font-size: 12px; color: #5f6368; margin-left: 8px; }
-.mtj-modo { display: flex; gap: 6px; margin-bottom: 16px; }
-.mtj-modo button { flex: 1; padding: 8px 12px; border-radius: 8px; cursor: pointer;
-  border: 1px solid #dadce0; background: #fff; font-size: 12.5px; }
-.mtj-modo button.on { border-color: #1a73e8; background: #e8f0fe; font-weight: 600; }
-.mtj-separar { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #3c4043;
-  margin: -8px 0 16px; cursor: pointer; }
-.mtj-separar input { width: 15px; height: 15px; margin: 0; }
-.mtj-sec { border: 1px solid #dadce0; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
-.mtj-sec > header { padding: 10px 14px; background: #f8f9fa; border-bottom: 1px solid #dadce0; }
-.mtj-cab { display: flex; align-items: center; gap: 10px; }
-.mtj-sec h2 { font-size: 13.5px; margin: 0; flex: 1; }
-.mtj-todos { width: 15px; height: 15px; flex-shrink: 0; margin: 0; cursor: pointer; }
-.mtj-cuenta { font-weight: 400; font-size: 11.5px; color: #80868b; margin-left: 7px;
-  font-family: ui-monospace, Menlo, monospace; }
-.mtj-sec label { font-size: 12px; color: #5f6368; display: flex; align-items: center; gap: 5px; }
-.mtj-ctrl { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-.mtj-sec input[type=number] { width: 48px; padding: 3px 6px; border: 1px solid #dadce0; border-radius: 6px; font-size: 12.5px; }
-.mtj-sec select { padding: 3px 6px; border: 1px solid #dadce0; border-radius: 6px; font-size: 12px; max-width: 150px; }
-.mtj-fila { display: flex; gap: 9px; padding: 6px 14px; border-top: 1px solid #f1f3f4; align-items: center; }
-.mtj-fila:first-of-type { border-top: none; }
-.mtj-fila input[type=checkbox] { width: 15px; height: 15px; flex-shrink: 0; }
-.mtj-fila > span { min-width: 0; display: flex; align-items: baseline; gap: 6px; }
-.mtj-fila .mtj-id { font-size: 12.5px; font-weight: 600; font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
-.mtj-fila .mtj-txt { font-size: 11.5px; color: #80868b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mtj-total { font-size: 13px; color: #202124; }
-.mtj-tag { font-size: 10px; color: #7a2f8f; border: 1px solid #e0d3ea; border-radius: 4px;
-  padding: 0 4px; white-space: nowrap; flex-shrink: 0; }
-/* El tipo de nivel: la mecánica con la que se juega. Va apagado y en monoespaciada
-   para que se lea como metadato y no compita con el id ni con el texto. */
-.mtj-tipo { font-size: 10px; color: #5f6368; background: #f1f3f4; border-radius: 4px;
-  padding: 1px 5px; white-space: nowrap; flex-shrink: 0;
-  font-family: ui-monospace, Menlo, monospace; }
-.mtj-avisos { border: 1px solid #f0b4b4; background: #fdf3f3; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; }
-.mtj-avisos li { font-size: 12px; color: #a52222; line-height: 1.45; margin-left: 16px; }
-.mtj-pie { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #dadce0;
-  padding: 14px 0 0; margin-top: 20px; }
-.mtj-empezar { width: 100%; padding: 13px; border: none; border-radius: 8px; background: #1a73e8;
-  color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
-.mtj-link { display: flex; gap: 8px; margin-top: 10px; }
-.mtj-link input { flex: 1; min-width: 0; padding: 8px 10px; border: 1px solid #dadce0; border-radius: 6px;
-  font-size: 11px; font-family: ui-monospace, Menlo, monospace; color: #5f6368; }
-.mtj-link button { padding: 8px 14px; border: 1px solid #dadce0; background: #fff; border-radius: 6px;
-  font-size: 12px; cursor: pointer; white-space: nowrap; }
-`;
-
 export default function PantallaMontaje() {
-  // Si la URL ya trae una configuración, el panel abre con ésa: así se puede
-  // tomar el enlace de otra persona, verlo y retocarlo.
+  // Si la URL ya trae un montaje, el panel abre con ése: así se puede tomar el
+  // enlace de otra persona, verlo y retocarlo.
   const [montaje, setMontaje] = useState(() => leerMontaje() ?? montajePorDefecto());
+  // Qué secciones están desplegadas. Arrancan las tres cerradas: así las tres
+  // cabeceras entran juntas en una pantalla de teléfono y se abre la que se va
+  // a tocar. No viaja en la URL ni se guarda — la URL lleva el montaje, y abrir
+  // o cerrar una sección es estado de mirada, no de montaje.
+  const [abiertas, setAbiertas] = useState(() => SECTIONS.map(() => false));
+  const [copiado, setCopiado] = useState(false);
+  // El tooltip del tope. Existía como `title`, que en un teléfono no se ve
+  // nunca: no hay hover. Es uno solo para las tres secciones porque la
+  // explicación es la misma.
+  const [ayudaTope, setAyudaTope] = useState(false);
   const avisos = useMemo(() => avisosDe(montaje), [montaje]);
   const url = useMemo(() => urlDeMontaje(montaje), [montaje]);
+
+  const plegar = (i) => setAbiertas((a) => a.map((v, j) => (j === i ? !v : v)));
 
   const cambiarSeccion = (i, parche) =>
     setMontaje((m) => ({
@@ -115,22 +85,24 @@ export default function PantallaMontaje() {
       }),
     }));
 
+  const enlace = window.location.origin + window.location.pathname + url;
+
   const empezar = () => {
     window.location.search = url;
   };
 
-  const copiar = (e) => {
-    const input = e.currentTarget.previousSibling;
-    input.select();
-    navigator.clipboard?.writeText(input.value).catch(() => {});
+  // Sin select(): en un teléfono levanta el teclado y tapa media pantalla para
+  // nada. El acuse alcanza para saber que salió.
+  const copiar = () => {
+    navigator.clipboard?.writeText(enlace).catch(() => {});
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 1600);
   };
 
   return (
     <div className="mtj">
-      <style>{ESTILOS}</style>
-      <h1>
-        Montaje <span>el enlace de abajo comparte esta configuración</span>
-      </h1>
+      <h1>Montaje</h1>
+      <p>Cómo queda armada la obra para esta función. El enlace de abajo la comparte entera.</p>
 
       <div className="mtj-modo">
         <button
@@ -148,7 +120,7 @@ export default function PantallaMontaje() {
       </div>
 
       {montaje.sortear && (
-        <label className="mtj-separar">
+        <label className="mtj-check mtj-separar">
           <input
             type="checkbox"
             checked={montaje.separar}
@@ -174,14 +146,16 @@ export default function PantallaMontaje() {
         const marcadas = entradas.filter((e) => cfg.ids.includes(idDe(e)));
         // Una cadena marcada aporta tantos niveles como eslabones tiene.
         const nivelesMarcados = marcadas.reduce((n, e) => n + largoDe(e), 0);
+        // En modo fijo la cantidad no se elige: es la que marcaste.
+        const aMostrar = montaje.sortear ? cfg.count : nivelesMarcados;
+        const abierta = abiertas[i];
         return (
           <section className="mtj-sec" key={seccion.id}>
-            <header>
-              <div className="mtj-cab">
+            <div className="mtj-cab">
+              <label>
                 <input
                   type="checkbox"
-                  className="mtj-todos"
-                  title="Marcar o desmarcar todos los niveles de la sección"
+                  aria-label="Marcar o desmarcar todos los niveles de la sección"
                   checked={marcadas.length === entradas.length}
                   // Ni todas ni ninguna: el check queda a medio camino.
                   ref={(el) => {
@@ -189,77 +163,103 @@ export default function PantallaMontaje() {
                   }}
                   onChange={() => alternarSeccion(i)}
                 />
+              </label>
+              <button className="mtj-plegar" aria-expanded={abierta} onClick={() => plegar(i)}>
+                <span className="mtj-flecha">▶</span>
                 <h2>
                   {i + 1}. {seccion.name}
-                  <span className="mtj-cuenta">
-                    {marcadas.length}/{entradas.length}
-                  </span>
                 </h2>
-                <label>
-                  mostrar
-                  {montaje.sortear ? (
-                    <input
-                      type="number"
-                      min="0"
-                      max="30"
-                      value={cfg.count}
-                      onChange={(e) => cambiarSeccion(i, { count: Number(e.target.value) })}
-                    />
-                  ) : (
-                    // En modo fijo la cantidad no se elige: es la que marcaste.
-                    <b className="mtj-total">{nivelesMarcados}</b>
-                  )}
-                </label>
-                {montaje.sortear && (
-                  <label title="Cuántos niveles de la misma mecánica puede traer la sección. 0 = sin tope.">
-                    máx. igual
-                    <input
-                      type="number"
-                      min="0"
-                      max="9"
-                      value={cfg.tope ?? 0}
-                      onChange={(e) => cambiarSeccion(i, { tope: Number(e.target.value) })}
-                    />
-                  </label>
-                )}
-              </div>
-              <div className="mtj-ctrl">
-                {['apertura', 'cierre'].map((cual) => (
-                  <label key={cual}>
-                    {cual === 'apertura' ? 'abre' : 'cierra'}
-                    <select
-                      value={cfg[cual] ?? ''}
-                      onChange={(e) => cambiarSeccion(i, { [cual]: e.target.value || null })}
-                    >
-                      <option value="">—</option>
-                      {marcadas.map((e) => (
-                        <option key={idDe(e)} value={idDe(e)}>
-                          {idDe(e)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ))}
-              </div>
-            </header>
+                <span className="mtj-cuenta">
+                  {marcadas.length}/{entradas.length} · <b>{aMostrar}</b>
+                </span>
+              </button>
+            </div>
 
-            {entradas.map((entrada) => {
-              const info = textoDe(entrada);
-              const on = cfg.ids.includes(info.id);
-              return (
-                <label className="mtj-fila" key={info.id}>
-                  <input type="checkbox" checked={on} onChange={() => alternar(i, info.id)} />
-                  <span>
-                    <span className="mtj-id">{info.id}</span>
-                  <span className="mtj-tipo">{info.tipo}</span>
-                    {info.cadena && <span className="mtj-tag">cadena ×{info.largo}</span>}
-                    {cfg.apertura === info.id && <span className="mtj-tag">abre</span>}
-                    {cfg.cierre === info.id && <span className="mtj-tag">cierra</span>}
-                    {info.texto && <span className="mtj-txt">{info.texto}</span>}
-                  </span>
-                </label>
-              );
-            })}
+            {abierta && (
+              <>
+                <div className="mtj-ctrl">
+                  <label>
+                    mostrar
+                    {montaje.sortear ? (
+                      <input
+                        type="number"
+                        min="0"
+                        max="30"
+                        value={cfg.count}
+                        onChange={(e) => cambiarSeccion(i, { count: Number(e.target.value) })}
+                      />
+                    ) : (
+                      <b>{nivelesMarcados}</b>
+                    )}
+                  </label>
+                  {montaje.sortear && (
+                    <label>
+                      tope por mecánica
+                      <input
+                        type="number"
+                        min="0"
+                        max="9"
+                        value={cfg.tope ?? 0}
+                        onChange={(e) => cambiarSeccion(i, { tope: Number(e.target.value) })}
+                      />
+                      <button
+                        type="button"
+                        className="mtj-ayuda"
+                        aria-expanded={ayudaTope}
+                        aria-label="Qué es el tope por mecánica"
+                        onClick={() => setAyudaTope((v) => !v)}
+                      >
+                        ?
+                      </button>
+                    </label>
+                  )}
+                  {['apertura', 'cierre'].map((cual) => (
+                    <label key={cual}>
+                      {cual === 'apertura' ? 'abre' : 'cierra'}
+                      <select
+                        value={cfg[cual] ?? ''}
+                        onChange={(e) => cambiarSeccion(i, { [cual]: e.target.value || null })}
+                      >
+                        <option value="">—</option>
+                        {marcadas.map((e) => (
+                          <option key={idDe(e)} value={idDe(e)}>
+                            {idDe(e)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ))}
+                </div>
+
+                {montaje.sortear && ayudaTope && (
+                  <p className="mtj-nota">
+                    Cuántos niveles de la misma mecánica entran en la sección. Con 2, no van a
+                    salir tres captchas de imagen. <b>0 = sin tope.</b> Si el tope no alcanza
+                    para llenar la sección, el sorteo lo pasa por alto antes que dejarla corta.
+                  </p>
+                )}
+
+                {entradas.map((entrada) => {
+                  const info = textoDe(entrada);
+                  const on = cfg.ids.includes(info.id);
+                  return (
+                    <label className="mtj-fila" key={info.id}>
+                      <input type="checkbox" checked={on} onChange={() => alternar(i, info.id)} />
+                      <span>
+                        <span className="mtj-meta">
+                          <span className="mtj-id">{info.id}</span>
+                          <span className="mtj-tipo">{info.tipo}</span>
+                          {info.cadena && <span className="mtj-tag">cadena ×{info.largo}</span>}
+                          {cfg.apertura === info.id && <span className="mtj-tag">abre</span>}
+                          {cfg.cierre === info.id && <span className="mtj-tag">cierra</span>}
+                        </span>
+                        {info.texto && <span className="mtj-txt">{info.texto}</span>}
+                      </span>
+                    </label>
+                  );
+                })}
+              </>
+            )}
           </section>
         );
       })}
@@ -269,8 +269,10 @@ export default function PantallaMontaje() {
           Empezar
         </button>
         <div className="mtj-link">
-          <input readOnly value={window.location.origin + window.location.pathname + url} />
-          <button onClick={copiar}>Copiar</button>
+          <input readOnly value={enlace} />
+          <button className="mtj-copiar" data-copiado={copiado ? 'si' : 'no'} onClick={copiar}>
+            {copiado ? 'Copiado' : 'Copiar'}
+          </button>
         </div>
       </div>
     </div>

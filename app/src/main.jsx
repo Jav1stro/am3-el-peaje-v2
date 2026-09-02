@@ -1,13 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import './styles/base.css';
-import PantallaMontaje from './montaje/PantallaMontaje'; // montaje: borrar con la carpeta
 
-// montaje: el panel de desarrollo vive en ?montaje y no lo ve nadie que entre
-// por el QR. Borrar estas dos líneas junto con src/montaje/.
+// montaje: el panel de montaje vive en ?montaje y no lo ve nadie que entre por
+// el QR. Los dos imports son dinámicos a propósito: así la obra y el panel no
+// comparten una sola regla de CSS. base.css nunca llega al panel (su body
+// centrado y su 100dvh le rompían el layout) y montaje.css nunca llega a la
+// obra. Para sacar el panel: borrar src/montaje/ y la rama de este ternario.
 const enMontaje = new URLSearchParams(window.location.search).has('montaje');
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>{enMontaje ? <PantallaMontaje /> : <App />}</React.StrictMode>
-);
+const pantalla = enMontaje
+  ? import('./montaje/PantallaMontaje')
+  : import('./styles/base.css').then(() => import('./App'));
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+pantalla.then(({ default: Pantalla }) => {
+  root.render(
+    <React.StrictMode>
+      <Pantalla />
+    </React.StrictMode>
+  );
+});

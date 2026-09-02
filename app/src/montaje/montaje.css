@@ -1,0 +1,400 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   PANEL DE MONTAJE — la herramienta con la que se arma el montaje (CONTEXT.md).
+   No es parte de la obra: el visitante no llega nunca acá.
+
+   Este archivo es autosuficiente a propósito. base.css no se carga cuando se
+   monta el panel (ver main.jsx), así que acá va también el reset. Borrar la
+   carpeta src/montaje/ no deja rastro en la obra.
+
+   Se opera con el pulgar, de pie en la sala y antes de abrir: de ahí los
+   blancos táctiles de 44px y los inputs de 16px (menos de eso y Safari en iOS
+   hace zoom al enfocarlos, y el user-scalable=no del index.html ya no lo evita).
+
+   Sin @media: como la obra, el panel es mobile-first y tiene un solo
+   comportamiento. En pantallas grandes sólo actúa el max-width.
+
+   El panel NO usa el azul institucional de la obra: parado en penumbra
+   conviene saber de un vistazo si estás en la herramienta o en la pieza.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.mtj {
+  /* Neutros propios, deliberadamente fuera de la paleta institucional. */
+  --mtj-fondo: #f4f5f7;
+  --mtj-papel: #ffffff;
+  --mtj-tinta: #1f2328;
+  --mtj-tenue: #656d76;
+  --mtj-apagado: #8c959f;
+  --mtj-borde: #d5d9de;
+  --mtj-borde-suave: #eaedf0;
+  --mtj-acento: #3f4650;
+  --mtj-acento-fondo: #e7e9ec;
+  --mtj-alerta: #8a3a20;
+  --mtj-alerta-fondo: #fdf2ee;
+  --mtj-alerta-borde: #f0cfc2;
+  --mtj-toque: 44px;
+
+  --mtj-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.mtj *,
+.mtj *::before,
+.mtj *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+.mtj {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 14px 40px;
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  color: var(--mtj-tinta);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* El panel pinta su propio fondo: sin base.css, el body no trae ninguno. */
+.mtj::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--mtj-fondo);
+  z-index: -1;
+}
+
+.mtj h1 { font-size: 17px; margin: 0 0 4px; }
+.mtj h1 + p { font-size: 13px; color: var(--mtj-tenue); margin: 0 0 16px; line-height: 1.4; }
+
+/* ── Modo: sortear o fijo ──────────────────────────────────────────────── */
+
+.mtj-modo { display: flex; gap: 8px; margin-bottom: 12px; }
+.mtj-modo button {
+  flex: 1;
+  min-height: var(--mtj-toque);
+  padding: 0 12px;
+  border: 1px solid var(--mtj-borde);
+  border-radius: 10px;
+  background: var(--mtj-papel);
+  color: var(--mtj-tenue);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.mtj-modo button.on {
+  border-color: var(--mtj-acento);
+  background: var(--mtj-acento-fondo);
+  color: var(--mtj-tinta);
+  font-weight: 600;
+}
+
+/* Cualquier control de una línea que se toca con el pulgar. */
+.mtj-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--mtj-toque);
+  font-size: 14px;
+  color: var(--mtj-tenue);
+  line-height: 1.35;
+  cursor: pointer;
+}
+.mtj-check input { flex-shrink: 0; }
+
+.mtj-separar { margin-bottom: 8px; }
+
+/* Los checkbox nativos son de ~15px: el blanco táctil se agranda con padding
+   negativo, así el dedo tiene 44px sin que la caja crezca en pantalla. */
+.mtj input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 1.5px solid var(--mtj-apagado);
+  border-radius: 5px;
+  background: var(--mtj-papel);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.mtj input[type='checkbox']::after {
+  /* El blanco táctil, invisible y centrado sobre la caja. */
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--mtj-toque);
+  height: var(--mtj-toque);
+  transform: translate(-50%, -50%);
+}
+.mtj input[type='checkbox']:checked {
+  border-color: var(--mtj-acento);
+  background: var(--mtj-acento);
+}
+.mtj input[type='checkbox']:checked::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 6px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--mtj-papel);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.mtj input[type='checkbox']:indeterminate {
+  border-color: var(--mtj-acento);
+  background: var(--mtj-acento);
+}
+.mtj input[type='checkbox']:indeterminate::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 3px;
+  width: 11px;
+  height: 2px;
+  background: var(--mtj-papel);
+}
+
+/* ── Avisos ───────────────────────────────────────────────────────────── */
+
+.mtj-avisos {
+  border: 1px solid var(--mtj-alerta-borde);
+  background: var(--mtj-alerta-fondo);
+  border-radius: 10px;
+  padding: 12px 14px 12px 30px;
+  margin-bottom: 12px;
+}
+.mtj-avisos li { font-size: 13.5px; color: var(--mtj-alerta); line-height: 1.45; }
+.mtj-avisos li + li { margin-top: 6px; }
+
+/* ── Sección ──────────────────────────────────────────────────────────── */
+
+.mtj-sec {
+  border: 1px solid var(--mtj-borde);
+  border-radius: 12px;
+  background: var(--mtj-papel);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+/* La cabecera hace dos cosas distintas y por eso son dos blancos separados:
+   el checkbox marca o desmarca la sección entera, el resto pliega. */
+.mtj-cab { display: flex; align-items: stretch; }
+.mtj-cab > label {
+  display: flex;
+  align-items: center;
+  padding: 0 4px 0 14px;
+  cursor: pointer;
+}
+.mtj-plegar {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 14px 8px 10px;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mtj-flecha {
+  flex-shrink: 0;
+  color: var(--mtj-apagado);
+  font-size: 11px;
+  transition: transform 0.15s ease;
+}
+.mtj-plegar[aria-expanded='true'] .mtj-flecha { transform: rotate(90deg); }
+.mtj-sec h2 {
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Dos números con significados distintos: cuántas entradas están marcadas
+   sobre el total, y cuántos niveles va a mostrar la sección. */
+.mtj-cuenta {
+  flex-shrink: 0;
+  font-family: var(--mtj-mono);
+  font-size: 12.5px;
+  color: var(--mtj-apagado);
+}
+.mtj-cuenta b { color: var(--mtj-tinta); font-weight: 600; }
+
+/* ── Controles de la sección (visibles al desplegar) ───────────────────── */
+
+.mtj-ctrl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 4px 14px 12px;
+  border-top: 1px solid var(--mtj-borde-suave);
+  padding-top: 12px;
+}
+.mtj-ctrl label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  color: var(--mtj-tenue);
+}
+.mtj input[type='number'],
+.mtj select {
+  min-height: var(--mtj-toque);
+  padding: 0 8px;
+  border: 1px solid var(--mtj-borde);
+  border-radius: 8px;
+  background: var(--mtj-papel);
+  color: var(--mtj-tinta);
+  font: inherit;
+  /* 16px o menos y Safari hace zoom al enfocar. */
+  font-size: 16px;
+}
+.mtj input[type='number'] { width: 68px; text-align: center; }
+.mtj select { max-width: 160px; padding-right: 4px; }
+
+/* El `title` de HTML no existe en un teléfono: no hay hover. Los controles que
+   necesitan explicarse la abren al tocarse. */
+.mtj-ayuda {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--mtj-borde);
+  border-radius: 50%;
+  background: var(--mtj-papel);
+  color: var(--mtj-tenue);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  position: relative;
+}
+/* El blanco táctil, invisible y centrado sobre el círculo. */
+.mtj-ayuda::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--mtj-toque);
+  height: var(--mtj-toque);
+  transform: translate(-50%, -50%);
+}
+.mtj-ayuda[aria-expanded='true'] {
+  border-color: var(--mtj-acento);
+  background: var(--mtj-acento);
+  color: var(--mtj-papel);
+}
+.mtj-nota {
+  margin: -4px 14px 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--mtj-acento-fondo);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--mtj-tenue);
+}
+.mtj-nota b { color: var(--mtj-tinta); }
+
+/* ── Fila de nivel: dos líneas, el texto entero ────────────────────────── */
+
+.mtj-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--mtj-borde-suave);
+  cursor: pointer;
+}
+.mtj-fila > input { margin-top: 2px; }
+.mtj-fila > span { flex: 1; min-width: 0; }
+
+.mtj-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.mtj-id {
+  font-family: var(--mtj-mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+/* El tipo de nivel es metadato: apagado, para que no compita con el id. */
+.mtj-tipo {
+  font-family: var(--mtj-mono);
+  font-size: 11px;
+  color: var(--mtj-tenue);
+  background: var(--mtj-acento-fondo);
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+.mtj-tag {
+  font-size: 11px;
+  color: var(--mtj-alerta);
+  border: 1px solid var(--mtj-alerta-borde);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+/* El texto del nivel va entero: en sala es la única pista de qué pregunta
+   cada uno, y hay ids como `perfil-conductual` que solos no dicen nada. */
+.mtj-txt {
+  display: block;
+  font-size: 13.5px;
+  color: var(--mtj-tenue);
+  line-height: 1.4;
+}
+
+/* ── Pie: no es fijo, con las secciones plegadas el panel es corto ─────── */
+
+.mtj-pie { margin-top: 20px; }
+.mtj-empezar {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: 10px;
+  background: var(--mtj-tinta);
+  color: var(--mtj-papel);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* El enlace se muestra entero aunque no se lea de un vistazo: es la prueba de
+   qué montaje estás por mandar. A 16px para que no dispare el zoom de iOS. */
+.mtj-link { display: flex; gap: 8px; margin-top: 10px; }
+.mtj-link input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--mtj-toque);
+  padding: 0 10px;
+  border: 1px solid var(--mtj-borde);
+  border-radius: 10px;
+  background: var(--mtj-papel);
+  font-family: var(--mtj-mono);
+  font-size: 16px;
+  color: var(--mtj-tenue);
+}
+.mtj-copiar {
+  flex-shrink: 0;
+  min-height: var(--mtj-toque);
+  padding: 0 16px;
+  border: 1px solid var(--mtj-borde);
+  border-radius: 10px;
+  background: var(--mtj-papel);
+  color: var(--mtj-tenue);
+  font: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mtj-copiar[data-copiado='si'] { border-color: var(--mtj-acento); color: var(--mtj-tinta); }
