@@ -5,7 +5,7 @@ export default function DrawingLevel({ level, stepLabel, onDone }) {
   const {
     logo = 'Registro final',
     title = 'Dibuje su identidad',
-    subtitle = 'El sistema emitirá su documento físico a partir de este registro',
+    subtitle = '',
     cta = 'Emitir documento',
     // Sólo el dibujo que se imprime va al store. Cualquier otro nivel de
     // dibujo es un trámite más y no debe pisar el que sale por la impresora.

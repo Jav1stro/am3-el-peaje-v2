@@ -188,6 +188,23 @@ sección 2. En caos alto (8-9) la card se vuelve un panel de terminal oscuro y
 translúcido para que la máquina se filtre a través de ella; el movimiento es
 mínimo (1px, `card-jitter`) para no impedir dibujar/interactuar.
 
+### El alto de la card
+
+La card tiene `min-height: 45dvh`. No es capricho: las mecánicas de poco
+contenido (`checkbox`, `statement`, `text`) ocupaban menos de un tercio de la
+pantalla y se veían perdidas en el medio, mientras las otras diez van del 45%
+al 80% por su propio contenido. Como es un **mínimo**, sólo actúa sobre esas
+tres — las demás no cambian una línea, y un nivel nuevo se acomoda solo sin
+agregar excepciones. Cuando sobra alto, `.card > .btn:last-child` con
+`margin-top: auto` manda la acción al pie y abre el aire en el medio.
+
+**No estirar la card más que eso.** El vacío alrededor no es espacio
+desaprovechado: es el lienzo donde se revela la capa-máquina (ADR 0003), que
+es `position: fixed; inset: 0` detrás de la card. En la sección 1 se ve vacío
+porque la máquina está al 0.015 de opacidad —a propósito—, pero de la sección
+2 en adelante ese mismo vacío está lleno. Una card a pantalla completa deja a
+la máquina sin dónde aparecer y vacía el ADR 0003.
+
 Detrás de la fachada se revela la **máquina** (ver CONTEXT.md, ADR 0003):
 `MachineLayer.jsx` monta una capa de fondo con una imagen de sustrato de
 `public/maquina/` (boot → terminal → datamosh según la banda de caos). Se

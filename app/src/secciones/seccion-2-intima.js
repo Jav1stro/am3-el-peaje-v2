@@ -105,7 +105,7 @@ export default [
     type: 'text',
     logo: 'Registro declarativo',
     question: 'Describa un deseo sexual breve.',
-    subtitle: 'Breve.',
+    // subtitle: 'Breve.',
     emptyHint: 'Todo humano tiene deseos sexuales de vez en cuando.',
   },
   {

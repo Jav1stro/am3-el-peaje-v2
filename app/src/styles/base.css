@@ -47,6 +47,16 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   position: relative;
   z-index: 2; /* siempre por encima de la capa-máquina */
+  /* Alto mínimo: sin él, las mecánicas de poco contenido (checkbox, statement,
+     text) ocupaban menos de un tercio de la pantalla y la card se veía perdida
+     en el medio. Es un mínimo, no un alto: las otras diez mecánicas ya lo
+     superan con su contenido y no cambian una línea. No se estira más porque
+     el vacío alrededor es donde se revela la capa-máquina (ADR 0003) — la card
+     a pantalla completa dejaría a la máquina sin lienzo. */
+  min-height: 45vh;
+  min-height: 45dvh;
+  display: flex;
+  flex-direction: column;
   /* la degradación por caos transiciona suave entre niveles */
   transition: background 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease, color 0.6s ease;
   --card-scan: 0; /* intensidad de scanlines internas, la sube cada .chaos-N */
@@ -63,6 +73,11 @@ body {
   transition: opacity 0.6s ease;
   z-index: 3;
 }
+
+/* Cuando sobra alto, la acción cae al pie de la card y el aire se abre en el
+   medio: se lee intencional en vez de "card a medio llenar", y deja el botón
+   donde llega el pulgar. En los niveles largos no sobra nada y no hace nada. */
+.card > .btn:last-child { margin-top: auto; }
 
 .card-header { margin-bottom: 20px; }
 .card-logo {
