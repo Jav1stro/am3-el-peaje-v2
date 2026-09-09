@@ -191,10 +191,13 @@ validación, rechazo
 ## Final
 
 El estado que alcanza el visitante al completar todos los niveles de todas las
-secciones. Existe de verdad — supersede el "loop infinito" de v1, donde ningún
-estado de éxito era posible. Al alcanzarlo, el dibujo que el visitante hizo en
-el **nivel de dibujo** se imprime en la sala como **ticket**: la obra termina
-en papel, fuera del teléfono.
+secciones. El **recorrido** existe de verdad y se puede terminar — supersede el
+"loop infinito" de v1 —, pero **terminarlo no abre la caja**: el agua nunca se
+habilita (ver **El agua**). Lo único que el sistema entrega es el **ticket**.
+
+Que el trámite tenga final y aun así no dé acceso no es una contradicción: es
+el remate. El visitante no fracasa —cumple con todo— y descubre que cumplir no
+era el camino, porque no había camino.
 
 ---
 
@@ -237,6 +240,10 @@ el dibujo del visitante. Es lo único que sobrevive a la visita: el recorrido no
 se guarda, el **expediente** muere al cerrar, y **empezar de cero** borra todo
 lo demás. Se lo lleva el visitante, no el sistema. En la ficción la **máquina**
 lo llama "documento físico".
+
+Es un comprobante de acceso a un acceso que no ocurrió: la máquina certifica
+por escrito lo que la caja desmiente. El visitante se va con la constancia de
+su propio trabajo, y sin el agua.
 _Evitar_: comprobante, impresión, papel
 
 ---
