@@ -33,6 +33,10 @@ jobs:
       - name: Construir
         run: npm run build
         working-directory: app
+        env:
+          # URL del túnel HTTPS de peaje-core (ADR 0005). Se configura como
+          # variable del repositorio; si falta, la app no imprime pero anda.
+          VITE_PEAJE_CORE_URL: ${{ vars.VITE_PEAJE_CORE_URL }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: app/dist

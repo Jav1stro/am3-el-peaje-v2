@@ -1,25 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRecorridoStore } from '../store/useRecorridoStore';
-import { sendDrawingToPrint } from '../lib/printRelay';
+import { sendDrawingToPrint } from '../lib/printClient';
 
 export default function FinalScreen() {
   const drawing = useRecorridoStore((s) => s.drawing);
-  const [status, setStatus] = useState('Emitiendo documento físico...');
+  // El final no promete un ticket antes de tenerlo: arranca en silencio y sólo
+  // habla si la estación confirmó la emisión. Si no hay estación —sin señal,
+  // apagada, sin configurar— el visitante nunca se entera de que había un
+  // papel, en vez de esperarlo frente a una impresora vacía (ver ADR 0005).
+  const [status, setStatus] = useState('');
   const sentRef = useRef(false);
 
   useEffect(() => {
     if (sentRef.current) return;
     sentRef.current = true;
-    if (!drawing) {
-      setStatus('Sin registro gráfico para emitir.');
-      return;
-    }
+    if (!drawing) return;
     sendDrawingToPrint(drawing).then((result) => {
-      setStatus(
-        result.ok
-          ? 'Documento emitido. Retírelo de la impresora.'
-          : ''
-      );
+      if (result.ok) setStatus('Documento emitido. Retírelo de la impresora.');
     });
   }, [drawing]);
 

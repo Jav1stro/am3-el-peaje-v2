@@ -2,7 +2,12 @@
 
 ## Estado
 
-Aceptada — 2026-07-01.
+Superada por [ADR 0005](0005-el-final-es-un-ticket.md) — 2026-09-09.
+
+Aceptada — 2026-07-01. Su decisión de fondo sigue en pie: el dibujo nace en el
+teléfono y se materializa en la sala, así que viaja por red y la impresora
+actúa sola. Lo que cambió es el transporte (ya no un canal en la nube) y el
+soporte (ya no una hoja por CUPS, sino un ticket térmico).
 
 ## Contexto
 

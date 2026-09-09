@@ -18,16 +18,18 @@ am3-el-peaje-v2/
 ├── CLAUDE.md
 ├── docs/adr/
 │   ├── 0001-recorrido-lineal-con-final.md
-│   └── 0002-impresion-por-relay.md
-├── app/                    # La aplicación (React + Vite)
-└── print-station/          # Estación de impresión (Node, corre en la compu de sala)
+│   └── ... (0005 supera al 0002: el final es un ticket térmico)
+└── app/                    # La aplicación (React + Vite)
+```
+
+La impresión ya no vive en este repo: la hace `peaje-core`, un servidor Python
+aparte que corre en la Raspberry de sala (ver más abajo).
 
 La única copia viva de cada sketch es la de `app/public/sketches/`. Los
 materiales originales entregados no se conservan en el repo — al integrar un
 sketch nuevo, se adapta directo a su carpeta de sección y el original se
 descarta. `app/dist/` es el resultado del build (descartable, se regenera con
 `npm run build`; no editar ahí).
-```
 
 ## App (`app/`)
 
@@ -246,19 +248,47 @@ otro en `useRecorridoStore.js`).
 - El panel **no usa el azul institucional**: tiene neutros propios en
   `montaje.css` para que en penumbra se distinga de la obra de un vistazo.
 
-## Estación de impresión (`print-station/`)
+## Impresión del final (ADR 0005)
 
-Corre en la compu de sala con la impresora USB. Escucha el canal
-`el-peaje-v2:imprenta` de Supabase y imprime con `lp` los dibujos que llegan.
+El final se imprime como **ticket térmico** en una Aclas PP7 (ESC/POS), y lo
+hace **`peaje-core`**: un servidor Python (FastAPI) que vive en otro repo y
+corre en la Raspberry Pi de sala. Este repo ya no tiene estación de impresión
+propia — `print-station` (Node + `lp`) y Supabase se eliminaron.
 
-```
-cd print-station && npm install
-SUPABASE_URL=... SUPABASE_ANON_KEY=... PRINTER=nombre npm start
-```
+`app/src/lib/printClient.js` manda el PNG del dibujo por `POST` a
+`{VITE_PEAJE_CORE_URL}/printer/drawing`. Sin esa variable la obra funciona
+completa: el final no imprime y no promete un ticket que no va a salir.
 
-Requiere en Supabase: bucket público `dibujos` en Storage. La app usa
-`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (ver `app/.env.example`).
-Sin env vars todo funciona salvo la impresión.
+**La app se sigue sirviendo por HTTPS desde GitHub Pages, y eso no es
+negociable**: cámara, micrófono y acelerómetro sólo existen en contexto seguro,
+así que servirla por `http://` desde la Raspberry apagaría las tres mecánicas de
+la sección 3 (y `CameraLevel` rompería). Por eso `peaje-core` se expone por un
+túnel HTTPS en lugar de servir la app. El razonamiento completo está en el ADR
+0005 — antes de proponer "que la Pi sirva la app", leerlo.
+
+`VITE_PEAJE_CORE_URL` **se hornea en build**: cambiar la URL del túnel exige
+reconstruir. En el sitio publicado se toma de una variable del repositorio (ver
+`.github/workflows/deploy.yml`).
+
+### El contrato con la estación
+
+Los dos repos no comparten código ni submódulo: la unión es **un solo llamado
+HTTP**, y por eso está escrito de los dos lados. Lo que la obra depende de que
+`peaje-core` mantenga:
+
+| | |
+|---|---|
+| Método y ruta | `POST {VITE_PEAJE_CORE_URL}/printer/drawing` |
+| Cuerpo | `multipart/form-data`, campo **`drawing`** |
+| Contenido | un PNG, fondo opaco, sin datos del visitante |
+| Éxito | `2xx` — y sólo entonces el final anuncia el ticket |
+| CORS | tiene que permitir el origen del sitio publicado |
+
+Si cambia cualquiera de esas filas, **la obra deja de imprimir sin avisar**: el
+final no promete nada, así que el fallo es invisible. Antes de una función,
+probar el recorrido entero hasta el ticket — no alcanza con que la app cargue.
+
+Al ticket va **solo el dibujo, anónimo** — ver la regla de abajo.
 
 ## Lo que NO hacer
 
@@ -268,6 +298,9 @@ Sin env vars todo funciona salvo la impresión.
   Los errores del sistema son declarativos (ver CONTEXT.md → Error no verificable).
 - No agregar sistemas de temas/estéticas: la única estética es la
   institucional degradándose por caos.
-- No mandar datos del visitante al canal de impresión: solo el dibujo, anónimo.
+- No mandar datos del visitante a la impresora: al ticket va solo el dibujo,
+  anónimo. Un ticket invita a ponerle número de expediente y código de trámite
+  —sería muy coherente con la ficción— pero eso es mandar sus respuestas a la
+  sala. No se hace (ver ADR 0005).
 - No portar la fila/presencia multiusuario de v1: no existe en v2.
 - No usar librerías de componentes UI.

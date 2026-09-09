@@ -193,8 +193,8 @@ validación, rechazo
 El estado que alcanza el visitante al completar todos los niveles de todas las
 secciones. Existe de verdad — supersede el "loop infinito" de v1, donde ningún
 estado de éxito era posible. Al alcanzarlo, el dibujo que el visitante hizo en
-el **nivel de dibujo** se imprime físicamente en la sala: la obra termina en
-papel, fuera del teléfono.
+el **nivel de dibujo** se imprime en la sala como **ticket**: la obra termina
+en papel, fuera del teléfono.
 
 ---
 
@@ -214,17 +214,30 @@ _Evitar_: nivel fijo, último nivel (ambiguo: el último que se ve, no el anclad
 ## Nivel de dibujo
 
 El último nivel del recorrido. El visitante dibuja en su teléfono; ese dibujo
-es lo que la impresora de la sala materializa al llegar al **final**. Es el
+es lo que se imprime como **ticket** al llegar al **final**. Es el
 **nivel de transición** de la sección 3.
 
 ---
 
 ## Estación de impresión
 
-El proceso que corre en la computadora de la sala, escucha los finales
-alcanzados y manda el dibujo a la impresora USB automáticamente, sin
-intervención humana. Es parte de la instalación, invisible para el visitante.
-_Evitar_: servidor, backend
+El aparato de la sala que materializa el **final**: recibe el dibujo del
+teléfono y lo imprime, sin intervención humana. Es parte de la instalación —
+está del lado del mundo físico, no del software— e invisible para el visitante.
+Su nombre propio es `peaje-core`.
+_Evitar_: servidor, backend (aunque hoy se implemente como uno: la estación es
+una pieza de la instalación, no la trastienda de la app)
+
+---
+
+## Ticket
+
+El papel que la **estación de impresión** emite al alcanzar el **final**, con
+el dibujo del visitante. Es lo único que sobrevive a la visita: el recorrido no
+se guarda, el **expediente** muere al cerrar, y **empezar de cero** borra todo
+lo demás. Se lo lleva el visitante, no el sistema. En la ficción la **máquina**
+lo llama "documento físico".
+_Evitar_: comprobante, impresión, papel
 
 ---
 

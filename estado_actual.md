@@ -31,8 +31,9 @@ degradando: a medida que sube el "caos", detrás de la fachada se revela la
 - **React + Vite**, JavaScript.
 - **CSS puro** (sin Tailwind ni librerías de componentes).
 - **Zustand** para estado global.
-- **Supabase** (Realtime + Storage) sólo para la impresión del dibujo — opcional:
-  sin credenciales la obra funciona completa salvo la impresión.
+- **`peaje-core`** (servidor Python en otro repo, corre en la Raspberry de sala)
+  sólo para imprimir el ticket del final — opcional: sin él la obra funciona
+  completa salvo la impresión. Ver ADR 0005.
 - **p5.js** disponible para sketches en iframe (hoy no hay ninguno en uso).
 
 ---
@@ -61,10 +62,12 @@ am3-el-peaje-v2/
 │       ├── components/     # MachineLayer, NoiseCanvas, ProcessingOverlay
 │       ├── data/           # recorridoConfig, verificaciones, tosText
 │       ├── store/          # useRecorridoStore (Zustand)
-│       ├── lib/            # supabase, printRelay
+│       ├── lib/            # printClient (manda el dibujo a peaje-core)
 │       └── styles/base.css # Toda la estética + la degradación por caos
-└── print-station/          # Proceso Node que corre en la compu de sala e imprime
 ```
+
+La impresión ya no vive acá: la hace `peaje-core` (repo aparte, Python) en la
+Raspberry de sala.
 
 Distinción clave (ver CONTEXT.md → *Tipo de nivel*): **`secciones/`** dice qué
 niveles hay; **`tipos-de-nivel/`** dice cómo se juega cada mecánica. Las
@@ -90,8 +93,8 @@ mecánicas se comparten entre secciones, por eso viven aparte.
 4. **Teatro de verificación entre niveles.** Un overlay "procesando" que no
    evalúa nada. No es aleatorio: la variante sigue el orden del pool según la
    posición del nivel, y adopta el diseño de su sección.
-5. **Final + impresión.** Al completar todo, el dibujo del último nivel se sube a
-   Supabase y la estación de impresión de la sala lo imprime por USB.
+5. **Final + impresión.** Al completar todo, el dibujo del último nivel se manda
+   por `POST` a `peaje-core`, que lo imprime como ticket térmico en la sala.
 
 ### Configuración actual (`data/recorridoConfig.js`)
 
@@ -225,9 +228,9 @@ Recorrido típico: 15 niveles.
 - **Teatro de verificación** (`data/verificaciones.js` + `ProcessingOverlay`) —
   pools por sección, determinístico, con estilos por sección (limpio / violeta /
   terminal).
-- **Impresión** (`lib/printRelay.js` + `print-station/`) — el teléfono publica el
-  dibujo en un canal de Supabase; la compu de sala lo escucha e imprime con `lp`.
-  Ver ADR 0002.
+- **Impresión** (`lib/printClient.js`) — el teléfono manda el PNG del dibujo por
+  `POST` a `peaje-core`, que lo imprime como ticket térmico (Aclas PP7, ESC/POS)
+  en la Raspberry de sala. Ver ADR 0005.
 
 ---
 
@@ -254,15 +257,9 @@ construir (en `npm run dev` la app sigue en la raíz) y **todo lo que salga de
 `public/` tiene que pasar por `asset()`** (`src/lib/asset.js`) — una ruta escrita
 a mano como `/imagenes/foo.jpg` funciona en local y da 404 publicada.
 
-Para la impresión (opcional):
-
-```bash
-cd print-station && npm install
-SUPABASE_URL=... SUPABASE_ANON_KEY=... PRINTER=nombre npm start
-```
-
-Requiere en Supabase un bucket público `dibujos`. La app lee
-`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (ver `app/.env.example`).
+Para la impresión (opcional): levantar `peaje-core` (repo aparte) y apuntarle
+la app con `VITE_PEAJE_CORE_URL` (ver `app/.env.example`). En sala esa URL es la
+del túnel HTTPS de la Raspberry; en desarrollo, `http://127.0.0.1:8000`.
 
 ---
 
@@ -297,8 +294,9 @@ Requiere en Supabase un bucket público `dibujos`. La app lee
 - ~~**Acceso desde el celular con sensores.**~~ Resuelto: el deploy a GitHub
   Pages es HTTPS, así que la cámara ya se puede probar en un teléfono real desde
   la URL publicada. Por IP local (`http://`) sigue bloqueada.
-- **Impresión en sala.** Falta crear el bucket en Supabase y dejar corriendo la
-  estación de impresión en la compu con la impresora.
+- **Impresión en sala.** `peaje-core` ya imprime contra la PP7 real, pero
+  todavía sólo un ticket de prueba: falta el endpoint que reciba el dibujo, el
+  reescalado al ancho del papel y el túnel HTTPS. Ver ADR 0005.
 - **Sección 3: sonido y umbrales a ojo.** Las cuatro mecánicas de cuerpo están
   implementadas, pero los parámetros se eligieron sin probarlos con un cuerpo
   real: cuántos segundos escucha `cansancio-voz`, cuántos grados y cuánto tiempo
