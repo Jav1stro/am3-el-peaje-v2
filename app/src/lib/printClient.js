@@ -3,7 +3,10 @@
 // HTTPS; VITE_PEAJE_CORE_URL dice adónde, y se hornea en build.
 //
 // Sin la variable, la obra funciona completa: el final simplemente no imprime.
-// El dibujo viaja solo, sin identificadores del visitante.
+// Con el dibujo viajan los textos del ticket, que son voz de la máquina:
+// ninguna respuesta del visitante llega al papel.
+
+import { TICKET_ENCABEZADO, piePara } from '../data/ticketText';
 
 const BASE = import.meta.env.VITE_PEAJE_CORE_URL;
 
@@ -16,6 +19,9 @@ export async function sendDrawingToPrint(dataUrl) {
   const blob = await (await fetch(dataUrl)).blob();
   const body = new FormData();
   body.append('drawing', blob, 'dibujo.png');
+  // La voz del ticket es de la obra, no de la estación (ver ADR 0005).
+  body.append('header', TICKET_ENCABEZADO);
+  body.append('footer', piePara());
 
   try {
     const res = await fetch(`${BASE}/printer/drawing`, { method: 'POST', body });

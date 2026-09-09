@@ -279,8 +279,9 @@ HTTP**, y por eso está escrito de los dos lados. Lo que la obra depende de que
 | | |
 |---|---|
 | Método y ruta | `POST {VITE_PEAJE_CORE_URL}/printer/drawing` |
-| Cuerpo | `multipart/form-data`, campo **`drawing`** |
-| Contenido | un PNG, fondo opaco, sin datos del visitante |
+| Cuerpo | `multipart/form-data` |
+| Campos | **`drawing`** (el PNG), **`header`** y **`footer`** (texto, ≤500 caracteres) |
+| Contenido | fondo opaco; ni el dibujo ni los textos llevan datos del visitante |
 | Éxito | `2xx` — y sólo entonces el final anuncia el ticket |
 | CORS | tiene que permitir el origen del sitio publicado |
 
@@ -288,7 +289,12 @@ Si cambia cualquiera de esas filas, **la obra deja de imprimir sin avisar**: el
 final no promete nada, así que el fallo es invisible. Antes de una función,
 probar el recorrido entero hasta el ticket — no alcanza con que la app cargue.
 
-Al ticket va **solo el dibujo, anónimo** — ver la regla de abajo.
+Los textos del ticket son de la obra, no de la estación: viven en
+`src/data/ticketText.js` como el resto de la voz de la máquina, y viajan en el
+mismo envío. `peaje-core` imprime lo que le dan — no sabe qué dice el ticket.
+
+Al ticket va **el dibujo y la voz de la máquina, nada del visitante** — ver la
+regla de abajo.
 
 ## Lo que NO hacer
 
