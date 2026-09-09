@@ -87,20 +87,32 @@ sin advertencias, y la app se queda donde ya está probada.
 - `VITE_PEAJE_CORE_URL` se hornea **en build**: cambiar la URL del túnel obliga
   a reconstruir y republicar. Está como variable del repo en el workflow de
   GitHub Pages para poder cambiarla sin tocar código.
-- **El túnel es `cloudflared`, no ngrok ni localtunnel.** Los tres exponen la
-  Raspberry por HTTPS, pero ngrok y localtunnel interponen una pantalla de
-  advertencia antes de dejar pasar: con un `User-Agent` de navegador,
-  localtunnel contesta `511` y una página HTML en vez de la respuesta, y ahí
-  muere el `fetch` del dibujo. Se esquiva mandando un header propio del
-  proveedor, pero eso mete el nombre de un servicio de túnel dentro del código
-  de la obra. `cloudflared` no interpone nada: mismo `User-Agent`, `200` y el
-  JSON. Probado.
-- **La URL gratuita de `cloudflared` no alcanza para una función.** Los
-  subdominios `*.trycloudflare.com` no los resuelven todos los DNS —el del ISP
-  donde se probó resuelve el dominio raíz pero no sus subdominios— y además
-  cambian en cada arranque. Para la sala hace falta un **túnel con nombre sobre
-  un dominio propio**: resuelve en cualquier lado y la dirección queda fija, así
-  el QR se imprime antes y no el día de la función.
+- **El túnel es Tailscale Funnel.** Se probaron tres y hay tres condiciones que
+  cumplir: que no interponga nada, que la dirección no cambie, y que la resuelva
+  cualquier DNS.
+  - **ngrok y localtunnel** interponen una pantalla de advertencia. Con un
+    `User-Agent` de navegador, localtunnel contesta `511` y una página HTML en
+    vez de la respuesta, y ahí muere el `fetch` del dibujo. Se esquiva mandando
+    un header propio del proveedor, pero eso mete el nombre de un servicio de
+    túnel dentro del código de la obra.
+  - **cloudflared** no interpone nada, pero su URL gratuita cambia en cada
+    arranque y los subdominios `*.trycloudflare.com` no los resuelven todos los
+    DNS (el del ISP donde se probó resuelve el dominio raíz pero no los
+    subdominios). Sirve con un dominio propio, que cuesta.
+  - **Tailscale Funnel** cumple las tres: hostname fijo, certificado de Let's
+    Encrypt a su nombre, sin pantalla intermedia, y gratis. Probado de punta a
+    punta: el dibujo sale del navegador, va a internet y vuelve, y se imprime.
+
+  Que el hostname sea fijo importa más de lo que parece: **el QR se imprime
+  antes de la función** en vez de generarlo el día.
+- Los límites de Funnel: publica sólo en 443/8443/10000 —el servicio local puede
+  seguir en el puerto que quiera— y tiene topes de ancho de banda que no
+  documentan. Para una sala donde cada visita manda un PNG de cientos de KB,
+  sobra.
+- **El endpoint queda público.** A los minutos de levantarlo ya entraron sondeos
+  automáticos buscando rutas comunes. No hay nada sensible expuesto, pero
+  `POST /printer/drawing` imprime: si eso molesta, bajar el Funnel cuando no hay
+  función con `tailscale funnel --https=443 off`.
 - Aparece una restricción física nueva: el ancho del papel. El dibujo se
   reescala al ancho de la impresora en `peaje-core`, no en la app.
 - Sigue en pie la regla de v1: **al ticket va solo el dibujo, anónimo**. Un

@@ -270,11 +270,12 @@ túnel HTTPS en lugar de servir la app. El razonamiento completo está en el ADR
 reconstruir. En el sitio publicado se toma de una variable del repositorio (ver
 `.github/workflows/deploy.yml`).
 
-El túnel se hace con **`cloudflared`**. ngrok y localtunnel interponen una
-pantalla de advertencia que rompe el envío del dibujo, y la URL gratuita de
-cloudflared no la resuelven todos los DNS y cambia en cada arranque: para una
-función hace falta un túnel con nombre sobre un dominio propio. El detalle, en
-el ADR 0005.
+El túnel se hace con **Tailscale Funnel**: da un hostname fijo con certificado
+real y no interpone ninguna pantalla. ngrok y localtunnel sí interponen una que
+rompe el envío del dibujo, y la URL gratuita de cloudflared cambia en cada
+arranque y no la resuelven todos los DNS. El detalle y las tres pruebas, en el
+ADR 0005. Se levanta con `tailscale funnel --bg 8000` en la Raspberry y se baja
+con `tailscale funnel --https=443 off`.
 
 ### El contrato con la estación
 

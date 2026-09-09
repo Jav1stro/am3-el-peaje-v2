@@ -301,12 +301,11 @@ del túnel HTTPS de la Raspberry; en desarrollo, `http://127.0.0.1:8000`.
 - ~~**Acceso desde el celular con sensores.**~~ Resuelto: el deploy a GitHub
   Pages es HTTPS, así que la cámara ya se puede probar en un teléfono real desde
   la URL publicada. Por IP local (`http://`) sigue bloqueada.
-- **Una dirección estable para la estación.** Es lo único que falta del lado de
-  la app para que el sitio publicado imprima. La URL gratuita de `cloudflared`
-  cambia en cada arranque y no la resuelven todos los DNS; hace falta un túnel
-  con nombre sobre un dominio propio. Después: cargar esa URL como variable
-  `VITE_PEAJE_CORE_URL` del repo, y el origen de GitHub Pages en
-  `PEAJE_ALLOWED_ORIGINS` de la Raspberry. Ver ADR 0005.
+- **Publicar la estación desde la Raspberry.** Resuelto el cómo: Tailscale
+  Funnel, gratis y con hostname fijo, probado de punta a punta desde el
+  navegador (ver ADR 0005). Falta hacerlo en la Raspberry de Nico y después
+  cargar esa URL como variable `VITE_PEAJE_CORE_URL` del repo y el origen de
+  GitHub Pages en `PEAJE_ALLOWED_ORIGINS` de la estación.
 - **Lo que necesita la PP7 física** (lo tiene Nico, en su repo `peaje-core`):
   aplicar el parche del endpoint; confirmar si el papel es de 58 u 80 mm, que
   cambia el ancho del dibujo y cuántos caracteres entran por renglón; ver si los
