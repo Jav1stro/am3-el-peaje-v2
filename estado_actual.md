@@ -1,6 +1,6 @@
 # El Peaje v2 — Estado actual
 
-_Última actualización: 2026-08-26_
+_Última actualización: 2026-09-09_
 
 Instantánea del proyecto para quien llega nuevo (o para retomarlo más adelante).
 Para el detalle conceptual ver [`CONTEXT.md`](./CONTEXT.md) (glosario de dominio),
@@ -272,6 +272,13 @@ del túnel HTTPS de la Raspberry; en desarrollo, `http://127.0.0.1:8000`.
   dibujo).
 - Sistema de caos + máquina + teatro de verificación, coherentes entre sí.
 - `npm run build` compila sin errores.
+- **La cadena de impresión, de punta a punta.** El dibujo del final viaja por
+  `POST` a `peaje-core`, que lo reescala al ancho del papel, lo convierte a 1 bit
+  y lo emite en ESC/POS con encabezado y letra chica. Probado contra el simulador
+  `escpresso` y también atravesando un túnel HTTPS desde afuera. Falta la
+  impresora física.
+- **El final no promete lo que no puede cumplir**: arranca en silencio y sólo
+  anuncia el ticket cuando la estación confirmó. Probado con la estación caída.
 
 **Pendiente / a definir**
 - **BORRAR ANTES DE LA SALA: la pantalla de montaje.** `?montaje` abre un panel
@@ -294,17 +301,31 @@ del túnel HTTPS de la Raspberry; en desarrollo, `http://127.0.0.1:8000`.
 - ~~**Acceso desde el celular con sensores.**~~ Resuelto: el deploy a GitHub
   Pages es HTTPS, así que la cámara ya se puede probar en un teléfono real desde
   la URL publicada. Por IP local (`http://`) sigue bloqueada.
-- **Impresión en sala.** `peaje-core` ya imprime contra la PP7 real, pero
-  todavía sólo un ticket de prueba: falta el endpoint que reciba el dibujo, el
-  reescalado al ancho del papel y el túnel HTTPS. Ver ADR 0005.
+- **Una dirección estable para la estación.** Es lo único que falta del lado de
+  la app para que el sitio publicado imprima. La URL gratuita de `cloudflared`
+  cambia en cada arranque y no la resuelven todos los DNS; hace falta un túnel
+  con nombre sobre un dominio propio. Después: cargar esa URL como variable
+  `VITE_PEAJE_CORE_URL` del repo, y el origen de GitHub Pages en
+  `PEAJE_ALLOWED_ORIGINS` de la Raspberry. Ver ADR 0005.
+- **Lo que necesita la PP7 física** (lo tiene Nico, en su repo `peaje-core`):
+  aplicar el parche del endpoint; confirmar si el papel es de 58 u 80 mm, que
+  cambia el ancho del dibujo y cuántos caracteres entran por renglón; ver si los
+  acentos salen bien (`peaje-core printer test` trae una línea con tildes y eñes
+  justo para eso); y decidir qué hacer si se queda sin papel, porque hoy la
+  estación igual contesta `200` y el final anunciaría un ticket que no salió.
+- **El texto del final contradice al glosario y al TP1.** La pantalla dice
+  "Accediste a la fuente de agua", pero `CONTEXT.md` (entrada *El agua*) y el
+  documento del TP1 dicen que la caja no se abre nunca — y los términos que el
+  visitante acepta en la S1 lo dicen por escrito (`tosText.js`, cláusula 7.1).
+  Es decisión de los cuatro autores, no técnica.
 - **Sección 3: sonido y umbrales a ojo.** Las cuatro mecánicas de cuerpo están
   implementadas, pero los parámetros se eligieron sin probarlos con un cuerpo
   real: cuántos segundos escucha `cansancio-voz`, cuántos grados y cuánto tiempo
   pide `movimiento` para vaciar el vaso. Se ajustan en las constantes al tope de
   `VoiceLevel.jsx` y `MotionLevel.jsx`.
-- **Verificación en dispositivo real.** El trabajo se validó con capturas
-  estáticas (Chrome headless) usando el CSS real; las animaciones y el
-  drag-and-drop conviene probarlos con el dedo en un teléfono.
+- **Verificación en dispositivo real.** El recorrido hasta el ticket ya se probó
+  interactivo en un navegador de escritorio; las animaciones, el drag-and-drop y
+  las tres mecánicas de cuerpo siguen sin probarse con el dedo en un teléfono.
 - **Sketches de p5.** La infraestructura (iframe + `SketchLevel` + helper de caos
   `peaje-chaos.js`) sigue disponible, pero hoy ningún nivel usa un sketch.
 
@@ -318,7 +339,10 @@ del túnel HTTPS de la Raspberry; en desarrollo, `http://127.0.0.1:8000`.
 
 ## Notas de repo
 
-- `app/dist/` es el resultado del build (descartable, se regenera). Conviene
-  ignorarlo en git junto con `node_modules/` y `.env.local`.
+- `app/dist/`, `node_modules/` y los `.env` ya están ignorados en git.
+- La estación de impresión vive en **otro repo** (`peaje-core`, de Nico). Para el
+  ensayo local conviene clonarlo al lado de éste; el guion `ensayo.sh` que levanta
+  los tres procesos queda fuera de ambos repos, porque coordina los dos y tiene
+  rutas de la máquina.
 - Los textos (TOS, verificaciones, errores) son ejemplos editables sin tocar
   componentes: viven en `app/src/data/`.

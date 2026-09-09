@@ -87,6 +87,20 @@ sin advertencias, y la app se queda donde ya está probada.
 - `VITE_PEAJE_CORE_URL` se hornea **en build**: cambiar la URL del túnel obliga
   a reconstruir y republicar. Está como variable del repo en el workflow de
   GitHub Pages para poder cambiarla sin tocar código.
+- **El túnel es `cloudflared`, no ngrok ni localtunnel.** Los tres exponen la
+  Raspberry por HTTPS, pero ngrok y localtunnel interponen una pantalla de
+  advertencia antes de dejar pasar: con un `User-Agent` de navegador,
+  localtunnel contesta `511` y una página HTML en vez de la respuesta, y ahí
+  muere el `fetch` del dibujo. Se esquiva mandando un header propio del
+  proveedor, pero eso mete el nombre de un servicio de túnel dentro del código
+  de la obra. `cloudflared` no interpone nada: mismo `User-Agent`, `200` y el
+  JSON. Probado.
+- **La URL gratuita de `cloudflared` no alcanza para una función.** Los
+  subdominios `*.trycloudflare.com` no los resuelven todos los DNS —el del ISP
+  donde se probó resuelve el dominio raíz pero no sus subdominios— y además
+  cambian en cada arranque. Para la sala hace falta un **túnel con nombre sobre
+  un dominio propio**: resuelve en cualquier lado y la dirección queda fija, así
+  el QR se imprime antes y no el día de la función.
 - Aparece una restricción física nueva: el ancho del papel. El dibujo se
   reescala al ancho de la impresora en `peaje-core`, no en la app.
 - Sigue en pie la regla de v1: **al ticket va solo el dibujo, anónimo**. Un

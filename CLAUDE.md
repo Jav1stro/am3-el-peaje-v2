@@ -270,6 +270,12 @@ túnel HTTPS en lugar de servir la app. El razonamiento completo está en el ADR
 reconstruir. En el sitio publicado se toma de una variable del repositorio (ver
 `.github/workflows/deploy.yml`).
 
+El túnel se hace con **`cloudflared`**. ngrok y localtunnel interponen una
+pantalla de advertencia que rompe el envío del dibujo, y la URL gratuita de
+cloudflared no la resuelven todos los DNS y cambia en cada arranque: para una
+función hace falta un túnel con nombre sobre un dominio propio. El detalle, en
+el ADR 0005.
+
 ### El contrato con la estación
 
 Los dos repos no comparten código ni submódulo: la unión es **un solo llamado

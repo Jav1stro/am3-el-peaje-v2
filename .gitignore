@@ -9,6 +9,10 @@ app/dist/
 .env.local
 *.local
 
+# Documentos del TP (pesan decenas de MB y no cambian con el código;
+# viven en el Drive de la cátedra, no acá — versionarlos infla cada clon).
+*.pdf
+
 # Sistema
 .DS_Store
 
