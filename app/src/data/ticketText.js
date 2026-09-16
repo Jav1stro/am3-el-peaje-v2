@@ -13,9 +13,13 @@
 // A 80 mm entran 48 y 64. La regla de abajo es la de 58, que es la angosta.
 //   |------------- 32 -------------|
 //   |------------------ 42 -------------------|
+//
+// OJO CON LAS MAYÚSCULAS ACENTUADAS. La PP7 imprime bien á é í ó ú ñ Ñ ¿ ¡,
+// pero Á É Í Ó Ú salen como basura (su página de códigos no las tiene). Hasta
+// que peaje-core cambie de página, el encabezado va sin tildes.
 
 export const TICKET_ENCABEZADO = `EL PEAJE
-VERIFICACIÓN DE IDENTIDAD
+VERIFICACION DE IDENTIDAD
 COMPROBANTE DE ACCESO A FUENTE`;
 
 // Se compone al emitir, para que la fecha sea la del final alcanzado.
