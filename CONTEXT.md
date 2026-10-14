@@ -219,8 +219,10 @@ _Evitar_: nivel fijo, último nivel (ambiguo: el último que se ve, no el anclad
 
 ## Nivel de dibujo
 
-El último nivel del recorrido. El visitante dibuja en su teléfono; ese dibujo
-es lo que se imprime como **ticket** al llegar al **final**. Es el
+El último nivel del recorrido. El lienzo trae un vaso vacío ya dibujado y el
+visitante traza la línea de cuánta agua le gustaría tomar; el vaso con esa
+marca es lo que se imprime como **ticket** al llegar al **final**: la medida
+de una necesidad que el sistema registra y nunca llena. Es el
 **nivel de transición** de la sección 3.
 
 ---

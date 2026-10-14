@@ -51,6 +51,11 @@ export default [
     id: 'dibujo',
     type: 'drawing',
     anchor: 'last',
-    title: 'Dibujá el vaso de agua.',
+    // El vaso ya viene dibujado: lo que se le pide es la línea de cuánta agua
+    // querría. El ticket se lleva el vaso con esa marca — la medida de una
+    // necesidad que el sistema nunca va a llenar.
+    plantilla: 'vaso',
+    title: 'Marcá cuánta agua te gustaría tomar.',
+    subtitle: 'Trazá una línea dentro del vaso. El sistema registrará la solicitud.',
   },
 ];

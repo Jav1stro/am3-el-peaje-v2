@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRecorridoStore } from '../store/useRecorridoStore';
+import { PLANTILLAS } from '../lib/plantillas';
 
 export default function DrawingLevel({ level, stepLabel, onDone }) {
   const {
@@ -10,24 +11,39 @@ export default function DrawingLevel({ level, stepLabel, onDone }) {
     // Sólo el dibujo que se imprime va al store. Cualquier otro nivel de
     // dibujo es un trámite más y no debe pisar el que sale por la impresora.
     guardar = true,
+    // Lo que el lienzo trae dibujado de entrada (ver src/lib/plantillas.js).
+    // No cuenta como trazo del visitante y sobrevive a "Borrar".
+    plantilla,
   } = level ?? {};
   const canvasRef = useRef(null);
   const drawingRef = useRef(false);
+  // El lado del lienzo en el que se dibuja, fijado al montar. Si la pantalla
+  // cambia de ancho después (rotar el teléfono, la barra del navegador), el
+  // lienzo se estira por CSS pero sus píxeles siguen siendo éstos: todo se
+  // mide contra este lado y no contra el ancho que tenga en pantalla.
+  const ladoRef = useRef(0);
   const trazosRef = useRef(0);
   const [hasStrokes, setHasStrokes] = useState(false);
   const [hint, setHint] = useState(null);
   const setDrawing = useRecorridoStore((s) => s.setDrawing);
 
+  // Fondo blanco opaco (la impresora lo exige) y, encima, la plantilla.
+  const lienzoInicial = (ctx, size) => {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, size, size);
+    PLANTILLAS[plantilla]?.(ctx, size);
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const dpr = window.devicePixelRatio || 1;
     const size = canvas.clientWidth;
+    ladoRef.current = size;
     canvas.width = size * dpr;
     canvas.height = size * dpr;
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, size, size);
+    lienzoInicial(ctx, size);
     ctx.strokeStyle = '#202124';
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
@@ -36,7 +52,8 @@ export default function DrawingLevel({ level, stepLabel, onDone }) {
 
   const pos = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    const k = ladoRef.current / rect.width;
+    return { x: (e.clientX - rect.left) * k, y: (e.clientY - rect.top) * k };
   };
 
   const start = (e) => {
@@ -67,9 +84,7 @@ export default function DrawingLevel({ level, stepLabel, onDone }) {
 
   const clear = () => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    lienzoInicial(canvas.getContext('2d'), ladoRef.current);
     trazosRef.current = 0;
     setHasStrokes(false);
   };

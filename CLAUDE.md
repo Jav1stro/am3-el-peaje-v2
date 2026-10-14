@@ -68,7 +68,11 @@ descarta. `app/dist/` es el resultado del build (descartable, se regenera con
   resuelve nunca y el nivel quedaría trabado — ningún nivel bloquea.
   `DrawingLevel` acepta
   `guardar: false`: sólo el dibujo del vaso va al store, que es el que sale por
-  la impresora.
+  la impresora. Acepta también `plantilla: '<nombre>'`: el lienzo arranca con
+  un dibujo hecho por código (`src/lib/plantillas.js`), que no cuenta como
+  trazo y sobrevive a "Borrar". El nivel final la usa: el vaso viene dibujado
+  y el visitante marca la línea de cuánta agua querría tomar. Las plantillas
+  son vectoriales, negras y sin relleno, porque van al ticket térmico.
   `OptionsLevel` lo usan S1 y S2. En `OptionsLevel`, `TextLevel` y
   `StatementLevel` el campo `body` es el **preámbulo**: lo que la máquina
   afirma antes de preguntar, y por eso se dibuja arriba del título con la clase
