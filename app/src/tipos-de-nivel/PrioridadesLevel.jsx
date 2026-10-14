@@ -41,6 +41,8 @@ export default function PrioridadesLevel({ level, stepLabel, onDone }) {
   const dragRef = useRef(null);
   const slotRefs = useRef([]);
   const doneRef = useRef(false);
+  // Lo que quedó en cada casilla al enviar: la verificación lo cita.
+  const renunciasRef = useRef([]);
 
   const setDrg = (d) => {
     dragRef.current = d;
@@ -102,7 +104,7 @@ export default function PrioridadesLevel({ level, stepLabel, onDone }) {
       if (Date.now() - started > 1300 && !doneRef.current) {
         doneRef.current = true;
         clearInterval(interval);
-        onDone();
+        onDone({ respuesta: { casillas: renunciasRef.current } });
       }
     }, 90);
     return () => clearInterval(interval);
@@ -124,6 +126,7 @@ export default function PrioridadesLevel({ level, stepLabel, onDone }) {
   const submit = () => {
     if (!anyFilled || glitching) return;
     setDrg(null);
+    renunciasRef.current = slots.map((d) => (d === null ? null : labelOf(d)));
     setGlitching(true);
   };
 

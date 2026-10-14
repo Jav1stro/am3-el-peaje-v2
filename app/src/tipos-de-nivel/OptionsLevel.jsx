@@ -39,7 +39,8 @@ export default function OptionsLevel({ level, stepLabel, onDone }) {
     if (record) {
       registrar(record, [...selected].map((i) => cita(options[i])).join(' y '));
     }
-    onDone();
+    const indices = [...selected].sort((a, b) => a - b);
+    onDone({ respuesta: { elegidas: indices.map((i) => etiqueta(options[i])), indices } });
   };
 
   return (

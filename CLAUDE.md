@@ -105,12 +105,19 @@ descarta. `app/dist/` es el resultado del build (descartable, se regenera con
 - `src/data/verificaciones.js` — el **teatro de verificación** (ver
   CONTEXT.md): pools exclusivos por sección con variantes de presentación
   (`spinner` | `bar` | `metrics` | `steps` | `glitch`), texto, código fake y
-  duración fija. NO es aleatorio: `verificationFor(section, step)` devuelve la
-  variante que corresponde a la posición del nivel dentro de su sección (recorre
-  el pool en orden). Los textos son ejemplos editables — cambiar ahí, sin tocar
-  `ProcessingOverlay.jsx` (que implementa los cinco estilos). El overlay adopta
-  el diseño de la sección vía la clase `proc-s{section}` (limpio / violeta /
-  terminal), en línea con la degradación de las cards.
+  duración fija. NO es aleatorio: `verificationFor(section, step, level,
+  respuesta)` devuelve la variante que corresponde a la posición del nivel
+  dentro de su sección (recorre el pool en orden). La excepción son las
+  **citas**: si el nivel tiene entrada en `CITAS_POR_NIVEL` (por id) o
+  `CITAS_POR_TIPO` (por mecánica), la verificación se arma con lo que el
+  visitante acaba de contestar —la cita arriba del panel, lo que la máquina
+  hace con eso abajo—. Lo que trae cada mecánica está documentado arriba de
+  esas tablas. Los textos son ejemplos editables — cambiar ahí, sin tocar
+  `ProcessingOverlay.jsx` (que implementa los cinco estilos). El overlay es un
+  velo casi transparente con un solo panel opaco, y la card del nivel se
+  atenúa detrás: la máquina sigue a la vista mientras se "verifica". El
+  overlay adopta el diseño de la sección vía la clase `proc-s{section}`
+  (limpio / violeta / terminal), en línea con la degradación de las cards.
 - `public/sketches/` — sketches de p5 en iframe, organizados por sección.
   Hoy no hay ninguno (prioridades pasó a nativo; los juegos se descartaron);
   quedan sólo las librerías compartidas en `lib/` (`p5.js` y `peaje-chaos.js`)
@@ -131,8 +138,9 @@ descarta. `app/dist/` es el resultado del build (descartable, se regenera con
   (`LEVEL_COMPONENTS`) y maneja el flujo: completado → spinner → (error no
   verificable) → avance.
 - Cada tipo de nivel recibe `onDone()` y lo llama al completarse la
-  interacción. La cámara puede llamar `onDone({ errorOverride })` si el
-  visitante niega el permiso.
+  interacción, con `{ respuesta }` para que el teatro de verificación la cite.
+  La cámara puede llamar `onDone({ errorOverride })` si el visitante niega el
+  permiso. La respuesta no se guarda: vive lo que dura la verificación.
 - `src/styles/base.css` — estética institucional + clases `chaos-1..9`.
   La clase de caos se aplica a `<html>` (no a `<body>`: los selectores son
   `.chaos-N body`).

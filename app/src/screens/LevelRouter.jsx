@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { useRecorridoStore } from '../store/useRecorridoStore';
-import { ERROR_DISPLAY_MS } from '../data/recorridoConfig';
+import { ERROR_DISPLAY_MS, ERROR_EN_VERIFICACION } from '../data/recorridoConfig';
 import { verificationFor } from '../data/verificaciones';
 import ProcessingOverlay from '../components/ProcessingOverlay';
 import CheckboxLevel from '../tipos-de-nivel/CheckboxLevel';
@@ -42,6 +42,10 @@ export default function LevelRouter() {
 
   const [processing, setProcessing] = useState(null); // mensaje del overlay
   const [flowError, setFlowError] = useState(null); // error no verificable
+  // El mismo error, pero declarado dentro del overlay (ERROR_EN_VERIFICACION).
+  // Va aparte de `processing` para no recrear la variante: si cambiara, las
+  // métricas y los pasos volverían a arrancar de cero.
+  const [verifError, setVerifError] = useState(null);
   const busyRef = useRef(false);
 
   const level = recorrido[index];
@@ -57,16 +61,29 @@ export default function LevelRouter() {
       const current = state.recorrido[state.index];
       const errorMsg = opts?.errorOverride ?? current.errorMsg ?? null;
 
-      // Teatro de verificación: NO aleatorio. La variante que toca según la
-      // posición del nivel dentro de su sección (avanza en orden con el pool).
+      // Teatro de verificación: NO aleatorio. Si el nivel trae su respuesta y
+      // tiene una cita, la verificación la retoma; si no, la variante que toca
+      // según la posición del nivel dentro de su sección (en orden con el pool).
       const posInSection = state.recorrido
         .slice(0, state.index + 1)
         .filter((l) => l.section === current.section).length - 1;
-      const verification = verificationFor(current.section, posInSection);
+      const verification = verificationFor(current.section, posInSection, current, opts?.respuesta);
       setProcessing(verification);
       const processingMs = verification.durationMs;
 
       setTimeout(() => {
+        // En las secciones que lo piden, el error se declara en el mismo panel
+        // de la verificación y de ahí se avanza: no se vuelve al nivel.
+        if (errorMsg && ERROR_EN_VERIFICACION.includes(current.section)) {
+          setVerifError(errorMsg);
+          setTimeout(() => {
+            setProcessing(null);
+            setVerifError(null);
+            busyRef.current = false;
+            advance();
+          }, ERROR_DISPLAY_MS);
+          return;
+        }
         setProcessing(null);
         if (errorMsg) {
           setFlowError(errorMsg);
@@ -94,7 +111,7 @@ export default function LevelRouter() {
         <LevelComponent key={level.id} level={level} stepLabel={stepLabel} onDone={handleDone} />
         {flowError && <div className="error-banner">{flowError}</div>}
       </div>
-      {processing && <ProcessingOverlay variant={processing} />}
+      {processing && <ProcessingOverlay variant={processing} error={verifError} />}
     </>
   );
 }

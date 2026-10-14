@@ -23,6 +23,8 @@ export default function MotionLevel({ level, stepLabel, onDone }) {
   const anguloRef = useRef(0);
   const dragRef = useRef(null);
   const derramadoRef = useRef(0);
+  const inicioRef = useRef(0); // desde que el vaso está listo: la verificación cita cuánto tardó
+  const segundosRef = useRef(0);
 
   // Un solo bucle acumula el derrame mientras el vaso esté inclinado, sin
   // importar si el ángulo viene del giroscopio o del dedo. El total vive en un
@@ -32,6 +34,7 @@ export default function MotionLevel({ level, stepLabel, onDone }) {
   useEffect(() => {
     if (phase !== 'ready') return;
     let ultimo = performance.now();
+    inicioRef.current = ultimo;
     let raf;
     const tick = (ahora) => {
       const dt = ahora - ultimo;
@@ -40,6 +43,7 @@ export default function MotionLevel({ level, stepLabel, onDone }) {
         derramadoRef.current = Math.min(derramadoRef.current + dt / DERRAME_MS, 1);
         setDerramado(derramadoRef.current);
         if (derramadoRef.current >= 1) {
+          segundosRef.current = Math.round((ahora - inicioRef.current) / 1000);
           setPhase('done');
           return; // vaso vacío: se corta el bucle
         }
@@ -142,7 +146,11 @@ export default function MotionLevel({ level, stepLabel, onDone }) {
       <button
         className="btn btn-primary"
         disabled={phase === 'ready'}
-        onClick={() => (phase === 'idle' ? empezar() : onDone())}
+        onClick={() =>
+          phase === 'idle'
+            ? empezar()
+            : onDone({ respuesta: { modo, segundos: segundosRef.current } })
+        }
       >
         {phase === 'done' ? 'Confirmar' : 'Iniciar verificación'}
       </button>

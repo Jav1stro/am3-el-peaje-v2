@@ -4,7 +4,8 @@ import { useRecorridoStore } from '../store/useRecorridoStore';
 // Pregunta abierta: el visitante escribe una respuesta libre.
 // La mecánica no evalúa nada — sólo exige que el campo no esté vacío.
 // Lo escrito no se guarda ni se manda a ningún lado: vive en el estado del
-// componente y muere al avanzar (ver CLAUDE.md → Lo que NO hacer).
+// componente, la verificación lo cita mientras dura y muere al avanzar (ver
+// CLAUDE.md → Lo que NO hacer).
 //
 // Todos los textos vienen del nivel: la mecánica es compartida entre
 // secciones (ver CONTEXT.md → Tipo de nivel), la voz la pone cada nivel.
@@ -30,7 +31,7 @@ export default function TextLevel({ level, stepLabel, onDone }) {
   const enviar = () => {
     if (!value.trim()) return setHint(emptyHint);
     if (record) registrar(record, value.trim());
-    onDone();
+    onDone({ respuesta: { texto: value.trim() } });
   };
 
   return (

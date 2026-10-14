@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 // Permutación aleatoria que no sea la identidad
 function shuffledOrder(n) {
@@ -17,6 +17,8 @@ export default function PuzzleLevel({ level, stepLabel, onDone }) {
   const [order, setOrder] = useState(() => shuffledOrder(level.pieces.length));
   const [picked, setPicked] = useState(null);
   const [hint, setHint] = useState(null);
+  const inicio = useRef(performance.now());
+  const movimientos = useRef(0);
   const solved = order.every((v, i) => v === i);
 
   const tap = (pos) => {
@@ -28,8 +30,17 @@ export default function PuzzleLevel({ level, stepLabel, onDone }) {
       [next[picked], next[pos]] = [next[pos], next[picked]];
       return next;
     });
+    movimientos.current += 1;
     setPicked(null);
   };
+
+  const terminar = () =>
+    onDone({
+      respuesta: {
+        segundos: Math.round((performance.now() - inicio.current) / 1000),
+        movimientos: movimientos.current,
+      },
+    });
 
   return (
     <>
@@ -54,7 +65,7 @@ export default function PuzzleLevel({ level, stepLabel, onDone }) {
       <button
         className="btn btn-primary"
         onClick={() =>
-          solved ? onDone() : setHint('Completá el rompecabezas antes de continuar.')
+          solved ? terminar() : setHint('Completá el rompecabezas antes de continuar.')
         }
       >
         Verificar

@@ -38,6 +38,7 @@ export default function VoiceLevel({ level, stepLabel, onDone }) {
   const ctxRef = useRef(null);
   const rafRef = useRef(null);
   const finRef = useRef(null);
+  const picoRef = useRef(0); // el volumen más alto que llegó: la verificación lo cita
   const [status, setStatus] = useState('Iniciando micrófono...');
   const [phase, setPhase] = useState('starting'); // starting | ready | listening | done
   const [nivel, setNivel] = useState(0); // volumen real, 0..1
@@ -48,7 +49,7 @@ export default function VoiceLevel({ level, stepLabel, onDone }) {
     const rendirse = setTimeout(() => {
       if (cancelled) return;
       setStatus('Sin respuesta');
-      onDone({ errorOverride: DENIED_ERROR });
+      onDone({ errorOverride: DENIED_ERROR, respuesta: { permitido: false, pico: 0 } });
     }, ESPERA_PERMISO_MS);
 
     navigator.mediaDevices
@@ -68,7 +69,10 @@ export default function VoiceLevel({ level, stepLabel, onDone }) {
         clearTimeout(rendirse);
         setStatus('Acceso denegado');
         // Negar el permiso no bloquea: error cínico y el trámite sigue.
-        setTimeout(() => onDone({ errorOverride: DENIED_ERROR }), 1500);
+        setTimeout(
+          () => onDone({ errorOverride: DENIED_ERROR, respuesta: { permitido: false, pico: 0 } }),
+          1500
+        );
       });
     return () => {
       cancelled = true;
@@ -102,7 +106,9 @@ export default function VoiceLevel({ level, stepLabel, onDone }) {
       // RMS sobre la onda cruda: 128 es el silencio en un Uint8Array.
       let suma = 0;
       for (const v of datos) suma += ((v - 128) / 128) ** 2;
-      setNivel(Math.min(Math.sqrt(suma / datos.length) * 4, 1));
+      const v = Math.min(Math.sqrt(suma / datos.length) * 4, 1);
+      picoRef.current = Math.max(picoRef.current, v);
+      setNivel(v);
 
       const t = performance.now() - inicio;
       setValues(metrics.map((m) => Math.min(Math.round((t / ESCUCHA_MS) * m.target), m.target)));
@@ -115,7 +121,7 @@ export default function VoiceLevel({ level, stepLabel, onDone }) {
         ctxRef.current = null;
         finRef.current = setTimeout(() => {
           if (streamRef.current) streamRef.current.getTracks().forEach((x) => x.stop());
-          onDone();
+          onDone({ respuesta: { permitido: true, pico: picoRef.current } });
         }, PAUSA_FINAL_MS);
         return;
       }

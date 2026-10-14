@@ -171,7 +171,10 @@ visitante), roto y errático en la 3. Cada sección tiene su pool exclusivo de
 verificaciones: al cruzar de sección, las formas de la anterior no vuelven a
 aparecer. La variante que le toca a cada nivel no es aleatoria: sigue el orden
 del pool según la posición del nivel en la sección, igual que avanza el
-recorrido.
+recorrido. Cuando puede, la verificación **cita** lo que el visitante acaba de
+contestar —la opción que eligió, lo que escribió, cuánto tardó, lo que leyó el
+sensor— y dice qué hace con eso: la máquina procesa lo que le dijiste, no un
+trámite genérico. La cita no se guarda: muere con la verificación.
 _Evitar_: loading, spinner (nombra una pieza visual, no el gesto), evaluación
 
 ---

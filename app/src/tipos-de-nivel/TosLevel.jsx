@@ -5,6 +5,13 @@ import { TOS_BASE, TOS_ADDENDUM_1, TOS_ADDENDUM_2, TOS_CLOSING } from '../data/t
 // visitante llega al final del scroll. Solo el tercer fondo habilita el botón.
 const PHASE_HEIGHTS = ['260px', '360px', '440px'];
 
+// Lo que el documento pide leer entero: la verificación lo compara con el
+// tiempo que el visitante tardó en aceptarlo.
+const PALABRAS = [TOS_BASE, TOS_ADDENDUM_1, TOS_ADDENDUM_2, TOS_CLOSING]
+  .join(' ')
+  .split(/\s+/)
+  .filter(Boolean).length;
+
 const TEASERS = [
   'ADENDA I — DISPOSICIONES COMPLEMENTARIAS AL TRATAMIENTO DE DATOS CONDUCTUALES...',
   'ADENDA II — CLÁUSULAS ESPECIALES PARA USUARIOS QUE HAN LLEGADO HASTA AQUÍ...',
@@ -15,6 +22,7 @@ export default function TosLevel({ stepLabel, onDone }) {
   const [canAccept, setCanAccept] = useState(false);
   const scrollRef = useRef(null);
   const addendumRef = useRef(null);
+  const inicio = useRef(performance.now());
 
   useEffect(() => {
     if (phase === 0) return;
@@ -76,7 +84,18 @@ export default function TosLevel({ stepLabel, onDone }) {
         )}
       </div>
 
-      <button className="btn btn-primary" disabled={!canAccept} onClick={onDone}>
+      <button
+        className="btn btn-primary"
+        disabled={!canAccept}
+        onClick={() =>
+          onDone({
+            respuesta: {
+              segundos: Math.round((performance.now() - inicio.current) / 1000),
+              palabras: PALABRAS,
+            },
+          })
+        }
+      >
         Acepto y continúo
       </button>
     </>

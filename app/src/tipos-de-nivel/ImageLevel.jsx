@@ -34,7 +34,9 @@ export default function ImageLevel({ level, stepLabel, onDone }) {
       <button
         className="btn btn-primary"
         onClick={() =>
-          selected.size > 0 ? onDone() : setHint('Seleccioná al menos una imagen.')
+          selected.size > 0
+            ? onDone({ respuesta: { marcadas: selected.size, total: level.tiles.length } })
+            : setHint('Seleccioná al menos una imagen.')
         }
       >
         Verificar

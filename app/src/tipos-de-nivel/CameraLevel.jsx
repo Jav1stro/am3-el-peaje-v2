@@ -42,7 +42,7 @@ export default function CameraLevel({ level, stepLabel, onDone }) {
     const rendirse = setTimeout(() => {
       if (cancelled) return;
       setStatus('Sin respuesta');
-      onDone({ errorOverride: DENIED_ERROR });
+      onDone({ errorOverride: DENIED_ERROR, respuesta: { permitido: false } });
     }, ESPERA_PERMISO_MS);
 
     navigator.mediaDevices
@@ -63,7 +63,10 @@ export default function CameraLevel({ level, stepLabel, onDone }) {
         clearTimeout(rendirse);
         setStatus('Acceso denegado');
         // Negar el permiso no bloquea: error cínico y el trámite sigue.
-        setTimeout(() => onDone({ errorOverride: DENIED_ERROR }), 1500);
+        setTimeout(
+          () => onDone({ errorOverride: DENIED_ERROR, respuesta: { permitido: false } }),
+          1500
+        );
       });
     return () => {
       cancelled = true;
@@ -93,7 +96,7 @@ export default function CameraLevel({ level, stepLabel, onDone }) {
         setPhase('done');
         analisisRef.current = setTimeout(() => {
           if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop());
-          onDone();
+          onDone({ respuesta: { permitido: true } });
         }, PAUSA_FINAL_MS);
       }
     }, 100);

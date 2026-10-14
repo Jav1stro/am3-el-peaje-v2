@@ -38,3 +38,9 @@ export const SEPARAR_MECANICAS = true;
 
 // Cuánto queda visible el "error no verificable" antes de avanzar (ms)
 export const ERROR_DISPLAY_MS = 2400;
+
+// Secciones (0-based) donde el "error no verificable" se declara dentro de la
+// pantalla de verificación, en vez de volver al nivel para mostrarlo. En la
+// sección 3 el sistema ya no disimula: el veredicto sale del mismo panel que
+// "procesó" el cuerpo, y el visitante no ve otra vez el nivel que ya terminó.
+export const ERROR_EN_VERIFICACION = [2];

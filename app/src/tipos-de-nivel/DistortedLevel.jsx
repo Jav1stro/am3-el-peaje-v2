@@ -76,13 +76,15 @@ export default function DistortedLevel({ level, stepLabel, onDone }) {
     if (!escrito) return setHint('Escribí el texto antes de continuar.');
     if (esperadas && !esperadas.some((r) => normalizar(r) === normalizar(escrito))) {
       fallidos.current += 1;
-      if (fallidos.current >= INTENTOS) return onDone({ errorOverride: RENDICION });
+      if (fallidos.current >= INTENTOS) {
+        return onDone({ errorOverride: RENDICION, respuesta: { escrito, intentos: fallidos.current } });
+      }
       const quedan = INTENTOS - fallidos.current;
       return setHint(
         `El texto no coincide. Te queda${quedan === 1 ? '' : 'n'} ${quedan} intento${quedan === 1 ? '' : 's'}.`
       );
     }
-    onDone();
+    onDone({ respuesta: { escrito, intentos: fallidos.current + 1 } });
   };
 
   return (
