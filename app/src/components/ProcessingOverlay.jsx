@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const GLITCH_CHARS = '#$%&@/\\01?!▓░';
 
@@ -115,7 +116,10 @@ export default function ProcessingOverlay({ variant, error }) {
   // El overlay adopta el diseño de la sección (limpio / violeta / terminal).
   const classes = [`proc-s${variant.section ?? 0}`, isGlitch ? 'glitched' : ''].join(' ').trim();
 
-  return (
+  // En <body>, fuera de #root, por lo mismo que MachineLayer: en caos 9 el
+  // temblor de #root lo achicaría y el panel dejaría de quedar centrado en la
+  // pantalla.
+  return createPortal(
     <div id="processing-overlay" className={classes}>
       {/* Sólo el panel es opaco: el resto del overlay es un velo leve, para
           que la máquina de fondo siga a la vista mientras se "verifica". */}
@@ -153,6 +157,7 @@ export default function ProcessingOverlay({ variant, error }) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 const COLORS = ['#b71c1c', '#1a237e', '#1b5e20', '#f57f17', '#880e4f', '#4a148c', '#e65100', '#006064', '#e91e63', '#0d47a1'];
 
+// En <body>, fuera de #root, por lo mismo que MachineLayer: el temblor de caos 9
+// la achicaría al tamaño de #root.
 export default function NoiseCanvas({ chaos }) {
   const canvasRef = useRef(null);
 
@@ -38,5 +41,5 @@ export default function NoiseCanvas({ chaos }) {
     };
   }, [chaos]);
 
-  return <canvas id="noise-canvas" ref={canvasRef} />;
+  return createPortal(<canvas id="noise-canvas" ref={canvasRef} />, document.body);
 }

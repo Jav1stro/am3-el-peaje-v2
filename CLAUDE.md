@@ -220,7 +220,14 @@ Detrás de la fachada se revela la **máquina** (ver CONTEXT.md, ADR 0003):
 `public/maquina/` (boot → terminal → datamosh según la banda de caos). Se
 revela por **opacidad** (`--machine-opacity` por `.chaos-N` en base.css), con
 glitch en caos alto y temblor de pantalla (`screen-shake` sobre `#root`) sólo
-en caos 9. Para volver al enfoque de grietas descartado, ver ADR 0003 — se
+en caos 9. Ese temblor es un `transform`, y un transform vuelve a `#root` el
+marco de todo `position: fixed` que tenga adentro: por eso la capa-máquina, el
+ruido y el overlay de verificación se montan en `<body>` con `createPortal`.
+Una capa fija nueva tiene que hacer lo mismo, o en caos 9 se achica al tamaño
+de la card. La contracara: `#root` lleva `position: relative; z-index: 1` para
+quedar por encima de esas capas — el mismo transform lo vuelve un contexto de
+apilamiento propio, y sin ese z-index la máquina tapa el nivel entero en caos 9.
+Para volver al enfoque de grietas descartado, ver ADR 0003 — se
 cambia sólo el CSS de `.machine-layer` y el componente.
 
 ## Panel de montaje (`app/src/montaje/`)

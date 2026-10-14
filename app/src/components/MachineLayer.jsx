@@ -5,6 +5,7 @@
 // (de casi 0 en caos bajo a casi opaco en caos alto). La imagen de sustrato se
 // elige por profundidad de colapso; en caos alto la capa además glitchea.
 
+import { createPortal } from 'react-dom';
 import { asset } from '../lib/asset';
 
 const SUBSTRATE = {
@@ -19,9 +20,16 @@ function substrateFor(chaos) {
   return SUBSTRATE.boot;
 }
 
+// Se monta directo en <body>, fuera de #root: en caos 9 #root tiembla con un
+// `transform`, y un transform convierte al elemento en el marco de referencia
+// de todo `position: fixed` que tenga adentro. Esta capa dejaría de cubrir la
+// pantalla y quedaría del tamaño de #root (ver base.css → screen-shake).
 export default function MachineLayer({ chaos }) {
   if (chaos <= 0) return null;
   const img = `url(${substrateFor(chaos)})`;
 
-  return <div className="machine-layer" aria-hidden="true" style={{ '--machine-img': img }} />;
+  return createPortal(
+    <div className="machine-layer" aria-hidden="true" style={{ '--machine-img': img }} />,
+    document.body
+  );
 }

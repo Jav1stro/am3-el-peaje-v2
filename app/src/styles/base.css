@@ -34,6 +34,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* Por encima de las capas de fondo (capa-máquina y ruido, z-index 0), que
+     viven en <body> fuera de #root. Sin esto, en caos 9 el temblor de #root
+     (un transform) lo vuelve un contexto de apilamiento propio: el z-index de
+     la card deja de competir con el fondo y la máquina, que se pinta después
+     en el DOM, tapa el nivel entero. */
+  position: relative;
+  z-index: 1;
 }
 
 /* CARD */
@@ -903,7 +910,11 @@ body:has(#processing-overlay) .card { opacity: 0.3; }
 .chaos-8 .machine-layer { animation: machine-glitch 1.8s steps(1) infinite; }
 .chaos-9 .machine-layer { animation: machine-glitch 1.1s steps(1) infinite; }
 
-/* Temblor de pantalla — sólo al final (chaos 9). */
+/* Temblor de pantalla — sólo al final (chaos 9). Ojo: un `transform` en #root
+   lo vuelve el marco de todo `position: fixed` que tenga adentro. Por eso la
+   capa-máquina, el ruido y el overlay de verificación se montan en <body> (con
+   un portal) y no dentro de #root: si no, en caos 9 se achican al tamaño de
+   la card. Una capa fija nueva tiene que hacer lo mismo. */
 @keyframes screen-shake {
   0%, 100% { transform: translate(0, 0); }
   10% { transform: translate(-2px, 1px); }
